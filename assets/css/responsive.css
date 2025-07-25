@@ -1,0 +1,770 @@
+/* 响应式扩展样式 */
+
+/* 超大屏幕 */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+    
+    .hero-text h1 {
+        font-size: 56px;
+    }
+    
+    .section-header h2 {
+        font-size: 40px;
+    }
+}
+
+/* 大屏幕 */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .hero-text h1 {
+        font-size: 44px;
+    }
+    
+    .doctors-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .news-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .news-item.featured {
+        grid-column: span 1;
+        grid-row: span 2;
+    }
+}
+
+/* 中等屏幕 */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .main-nav .container {
+        padding: 0 10px;
+    }
+    
+    .nav-menu a {
+        padding: 15px 12px;
+        font-size: 14px;
+    }
+    
+    .search-box {
+        max-width: 400px;
+    }
+    
+    .hero-text h1 {
+        font-size: 40px;
+    }
+    
+    .quick-nav-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .departments-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .doctors-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .news-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .news-item.featured {
+        grid-column: span 2;
+    }
+}
+
+/* 小屏幕平板 */
+@media (min-width: 768px) and (max-width: 991px) {
+    .top-bar .container {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .main-nav .container {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 10px;
+    }
+    
+    .nav-left {
+        order: 1;
+        flex: 1;
+    }
+    
+    .nav-right {
+        order: 3;
+        flex: 1;
+    }
+    
+    .nav-center {
+        order: 2;
+        flex: 1 1 100%;
+        margin: 15px 0;
+    }
+    
+    .nav-menu ul {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .nav-menu a {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .hero-content .container {
+        gap: 30px;
+    }
+    
+    .hero-text {
+        max-width: 100%;
+    }
+    
+    .hero-image {
+        max-width: 70%;
+    }
+    
+    .quick-nav-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .departments-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .doctors-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .news-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .news-item.featured {
+        grid-column: span 2;
+    }
+    
+    .qa-item {
+        padding: 20px;
+    }
+    
+    .question-stats {
+        gap: 15px;
+    }
+    
+    .footer-sections {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 大手机屏幕 */
+@media (min-width: 576px) and (max-width: 767px) {
+    .top-bar {
+        display: none;
+    }
+    
+    .main-nav .container {
+        height: 60px;
+        justify-content: space-between;
+    }
+    
+    .nav-center, .nav-right {
+        display: none;
+    }
+    
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    .hero-section {
+        min-height: 400px;
+    }
+    
+    .hero-content {
+        padding: 50px 0;
+    }
+    
+    .hero-text h1 {
+        font-size: 28px;
+    }
+    
+    .hero-text p {
+        font-size: 16px;
+    }
+    
+    .hero-actions {
+        gap: 10px;
+    }
+    
+    .section-header h2 {
+        font-size: 28px;
+    }
+    
+    .quick-nav-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .quick-nav-item {
+        padding: 25px 15px;
+    }
+    
+    .nav-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .quick-nav-item h3 {
+        font-size: 16px;
+    }
+    
+    .departments-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .department-item {
+        padding: 20px;
+    }
+    
+    .doctors-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .doctor-card {
+        padding: 20px;
+    }
+    
+    .news-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .news-item.featured {
+        grid-column: span 1;
+    }
+    
+    .qa-item {
+        padding: 20px;
+        flex-direction: column;
+    }
+    
+    .question-stats {
+        margin-left: 0;
+        margin-top: 15px;
+        justify-content: flex-start;
+    }
+}
+
+/* 小手机屏幕 */
+@media (max-width: 575px) {
+    .top-bar {
+        display: none;
+    }
+    
+    .main-nav .container {
+        height: 60px;
+        padding: 0 10px;
+    }
+    
+    .logo-text {
+        font-size: 20px;
+    }
+    
+    .nav-center, .nav-right {
+        display: none;
+    }
+    
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    .hero-section {
+        min-height: 350px;
+    }
+    
+    .hero-content {
+        padding: 40px 0;
+        text-align: center;
+    }
+    
+    .hero-text h1 {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    
+    .hero-text p {
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .hero-actions .btn {
+        padding: 12px 24px;
+        font-size: 14px;
+        width: 200px;
+    }
+    
+    .hero-image {
+        display: none;
+    }
+    
+    .section-header {
+        margin-bottom: 30px;
+    }
+    
+    .section-header h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    
+    .section-header p {
+        font-size: 14px;
+    }
+    
+    .quick-nav-section {
+        padding: 40px 0;
+    }
+    
+    .quick-nav-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .quick-nav-item {
+        padding: 20px 15px;
+    }
+    
+    .nav-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    
+    .quick-nav-item h3 {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    
+    .quick-nav-item p {
+        font-size: 13px;
+    }
+    
+    .departments-section, .featured-doctors-section, .latest-news-section, .hot-qa-section, .popular-search-section {
+        padding: 40px 0;
+    }
+    
+    .departments-grid {
+        gap: 15px;
+    }
+    
+    .department-item {
+        padding: 15px;
+    }
+    
+    .dept-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    
+    .department-item h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .sub-departments span {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+    
+    .doctors-grid {
+        gap: 15px;
+    }
+    
+    .doctor-card {
+        padding: 15px;
+    }
+    
+    .doctor-avatar img, .avatar-placeholder {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .avatar-placeholder {
+        font-size: 24px;
+    }
+    
+    .doctor-info h3 {
+        font-size: 16px;
+    }
+    
+    .doctor-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .doctor-actions .btn {
+        width: 100%;
+    }
+    
+    .news-grid {
+        gap: 15px;
+    }
+    
+    .news-item {
+        margin-bottom: 0;
+    }
+    
+    .news-image {
+        height: 150px;
+    }
+    
+    .news-content {
+        padding: 15px;
+    }
+    
+    .news-content h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .news-summary {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    
+    .news-meta {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+    }
+    
+    .qa-item {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .question-content h3 {
+        font-size: 16px;
+    }
+    
+    .question-preview {
+        font-size: 13px;
+    }
+    
+    .question-meta {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    
+    .question-stats {
+        margin-top: 15px;
+        gap: 10px;
+    }
+    
+    .stat-number {
+        font-size: 16px;
+    }
+    
+    .qa-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .qa-actions .btn {
+        width: 200px;
+    }
+    
+    .search-tags {
+        gap: 8px;
+    }
+    
+    .search-tag {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    
+    .search-count {
+        font-size: 10px;
+    }
+    
+    .footer-content {
+        padding: 40px 0 20px;
+    }
+    
+    .footer-sections {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .footer-section h3 {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .footer-description {
+        font-size: 14px;
+    }
+    
+    .contact-item {
+        font-size: 13px;
+    }
+    
+    .footer-links a {
+        font-size: 13px;
+    }
+    
+    .social-links {
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .social-link {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-item {
+        padding: 10px;
+    }
+    
+    .stat-number {
+        font-size: 16px;
+    }
+    
+    .stat-label {
+        font-size: 11px;
+    }
+    
+    .footer-bottom {
+        padding: 20px 0;
+    }
+    
+    .footer-bottom-content {
+        font-size: 12px;
+    }
+    
+    .disclaimer-text {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+    
+    .online-service {
+        left: 10px;
+        bottom: 10px;
+    }
+    
+    .service-btn {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    
+    .service-panel {
+        width: 250px;
+    }
+    
+    .back-to-top {
+        right: 10px;
+        bottom: 10px;
+        width: 45px;
+        height: 45px;
+    }
+    
+    .pagination {
+        margin: 30px 0;
+        gap: 3px;
+    }
+    
+    .pagination a, .pagination span {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+    
+    /* 移动端搜索建议 */
+    .search-suggestions {
+        font-size: 14px;
+    }
+    
+    .suggestion-item {
+        padding: 12px 15px;
+    }
+    
+    /* 移动端下拉菜单 */
+    .dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        background: #f8f9fa;
+        margin-top: 5px;
+        border-radius: 8px;
+    }
+    
+    .dropdown-menu a {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 360px) {
+    .container {
+        padding: 0 8px;
+    }
+    
+    .hero-content {
+        padding: 30px 0;
+    }
+    
+    .hero-text h1 {
+        font-size: 20px;
+    }
+    
+    .hero-actions .btn {
+        width: 160px;
+        padding: 10px 16px;
+    }
+    
+    .section-header h2 {
+        font-size: 20px;
+    }
+    
+    .quick-nav-item {
+        padding: 15px 10px;
+    }
+    
+    .department-item, .doctor-card, .news-item {
+        padding: 12px;
+    }
+    
+    .qa-item {
+        padding: 12px;
+    }
+    
+    .service-panel {
+        width: 220px;
+    }
+    
+    .stats-grid {
+        gap: 8px;
+    }
+    
+    .stat-item {
+        padding: 8px;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .top-bar, .main-nav, .hero-section, .quick-nav-section, .popular-search-section, .main-footer, .back-to-top, .online-service, .mobile-menu-btn, .mobile-menu {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .section-header, .news-item, .doctor-card, .qa-item, .department-item {
+        break-inside: avoid;
+    }
+    
+    .container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+        color: #000;
+        background: #fff;
+    }
+    
+    a {
+        color: #000;
+        text-decoration: underline;
+    }
+    
+    .btn {
+        display: none;
+    }
+}
+
+/* 横屏优化 */
+@media (orientation: landscape) and (max-height: 500px) {
+    .hero-section {
+        min-height: 300px;
+    }
+    
+    .hero-content {
+        padding: 30px 0;
+    }
+    
+    .hero-text h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+    
+    .hero-text p {
+        margin-bottom: 20px;
+    }
+}
+
+/* 无障碍访问支持 */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .btn-primary {
+        background: #000;
+        border: 2px solid #000;
+        color: #fff;
+    }
+    
+    .btn-secondary {
+        background: #fff;
+        border: 2px solid #000;
+        color: #000;
+    }
+    
+    .search-form {
+        border: 2px solid #000;
+    }
+    
+    .nav-menu a:hover, .nav-menu .active a {
+        background: #000;
+        color: #fff;
+    }
+}

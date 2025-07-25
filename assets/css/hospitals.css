@@ -1,0 +1,683 @@
+/* 医院页面专用样式 */
+
+.hospitals-page {
+    padding: 20px 0 60px;
+    background: #f8f9fa;
+}
+
+.breadcrumb-section {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 15px 0;
+}
+
+.hospital-search-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.search-header h1 {
+    font-size: 36px;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.search-header p {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 40px;
+}
+
+.hospital-search-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-input-group {
+    display: flex;
+    background: white;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.search-input {
+    flex: 1;
+    padding: 18px 25px;
+    border: none;
+    font-size: 16px;
+    outline: none;
+    background: transparent;
+}
+
+.search-btn {
+    padding: 18px 30px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-btn:hover {
+    background: #4338ca;
+}
+
+.hospitals-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+/* 筛选侧边栏 */
+.hospitals-filters {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.filters-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clear-filters {
+    color: #4f46e5;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.clear-filters:hover {
+    text-decoration: underline;
+}
+
+.filter-group {
+    padding: 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.filter-group:last-child {
+    border-bottom: none;
+}
+
+.filter-group h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 15px 0;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    color: #6b7280;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.filter-option:hover,
+.filter-option.active {
+    background: #4f46e5;
+    color: white;
+}
+
+.filter-option .count {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.recommended-hospitals {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.recommended-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.recommended-item:last-child {
+    border-bottom: none;
+}
+
+.recommended-item h5 {
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.recommended-item h5 a {
+    color: #1f2937;
+    text-decoration: none;
+}
+
+.recommended-item h5 a:hover {
+    color: #4f46e5;
+}
+
+.hospital-meta {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.hospital-rating {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: #fbbf24;
+}
+
+.hospital-rating span {
+    color: #6b7280;
+}
+
+/* 主内容区 */
+.hospitals-main {
+    min-height: 600px;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.results-info h2 {
+    font-size: 24px;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.results-info p {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.sort-select {
+    padding: 8px 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* 医院列表 */
+.hospitals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.hospital-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.hospital-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #4f46e5;
+}
+
+.hospital-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 25px 25px 15px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.hospital-basic-info {
+    flex: 1;
+}
+
+.hospital-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.hospital-name a {
+    color: #1f2937;
+    text-decoration: none;
+}
+
+.hospital-name a:hover {
+    color: #4f46e5;
+}
+
+.hospital-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.level-badge {
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.level-三a { background: #ef4444; }
+.level-三b { background: #f97316; }
+.level-二a { background: #eab308; }
+.level-二b { background: #84cc16; }
+.level-一a { background: #22c55e; }
+.level-一b { background: #06b6d4; }
+.level-专科 { background: #8b5cf6; }
+
+.type-badge {
+    padding: 4px 12px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.hospital-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #fbbf24;
+}
+
+.rating-score {
+    color: #1f2937;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+.hospital-content {
+    padding: 0 25px 20px;
+}
+
+.hospital-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.info-row i {
+    color: #4f46e5;
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.info-row a {
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+.info-row a:hover {
+    text-decoration: underline;
+}
+
+.hospital-description {
+    margin-bottom: 15px;
+}
+
+.hospital-description p {
+    color: #374151;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.hospital-specialties {
+    background: #f0f9ff;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border-left: 4px solid #4f46e5;
+    font-size: 13px;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+.hospital-actions {
+    display: flex;
+    gap: 12px;
+    padding: 20px 25px;
+    background: #f9fafb;
+    border-top: 1px solid #f3f4f6;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: #4f46e5;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.btn-outline {
+    background: white;
+    color: #6b7280;
+    border-color: #e5e7eb;
+}
+
+.btn-outline:hover {
+    background: #f9fafb;
+    color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+/* 无结果页面 */
+.no-results {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.no-results-icon {
+    font-size: 64px;
+    color: #d1d5db;
+    margin-bottom: 25px;
+}
+
+.no-results h3 {
+    font-size: 24px;
+    color: #1f2937;
+    margin-bottom: 15px;
+}
+
+.no-results p {
+    color: #6b7280;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.no-results-suggestions {
+    text-align: left;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.no-results-suggestions h4 {
+    color: #1f2937;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.no-results-suggestions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.no-results-suggestions li {
+    padding: 5px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.no-results-suggestions a {
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+/* 地图弹窗 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    color: #1f2937;
+}
+
+.modal-body {
+    padding: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .hospitals-layout {
+        grid-template-columns: 250px 1fr;
+        gap: 30px;
+    }
+    
+    .hospital-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .hospitals-layout {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .hospitals-filters {
+        position: static;
+        order: 2;
+    }
+    
+    .hospitals-main {
+        order: 1;
+    }
+    
+    .hospital-search-section {
+        padding: 40px 0;
+    }
+    
+    .search-header h1 {
+        font-size: 28px;
+    }
+    
+    .search-input-group {
+        flex-direction: column;
+        border-radius: 12px;
+    }
+    
+    .search-input {
+        padding: 15px 20px;
+    }
+    
+    .search-btn {
+        padding: 15px 20px;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    .results-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .hospital-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .hospital-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .btn {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+    }
+    
+    .filter-group {
+        padding: 15px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-header h1 {
+        font-size: 24px;
+    }
+    
+    .search-header p {
+        font-size: 16px;
+    }
+    
+    .hospital-card {
+        margin: 0 -10px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .hospital-header,
+    .hospital-content,
+    .hospital-actions {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .hospital-name {
+        font-size: 18px;
+    }
+    
+    .hospital-badges {
+        flex-wrap: wrap;
+    }
+    
+    .hospital-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
