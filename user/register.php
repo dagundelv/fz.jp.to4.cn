@@ -12,6 +12,9 @@ $pageTitle = "用户注册 - " . SITE_NAME;
 $pageDescription = "注册账户，享受个性化的健康服务";
 $pageKeywords = "用户注册,账户注册,健康服务";
 
+// 添加页面特定的CSS
+$pageCSS = ['/assets/css/user.css'];
+
 // 处理注册表单提交
 $registerError = '';
 $registerSuccess = false;

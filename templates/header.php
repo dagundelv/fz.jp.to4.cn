@@ -83,122 +83,12 @@
                 
                 <div class="nav-right">
                     <div class="nav-menu">
-                        <ul class="main menu">
+                        <ul class="main-menu">
                             <li class="<?php echo $currentPage == 'index' ? 'active' : ''; ?>">
                                 <a href="/">
                                     <i class="fas fa-home"></i>
                                     <span>首页</span>
                                 </a>
-                            </li>
-                            
-                            <li class="dropdown <?php echo $currentPage == 'news' ? 'active' : ''; ?>">
-                                <a href="/news/">
-                                    <i class="fas fa-newspaper"></i>
-                                    <span>健康头条</span>
-                                    <i class="fas fa-chevron-down arrow"></i>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a href="/news/">最新资讯</a>
-                                    <a href="/news/?category=policy">医疗政策</a>
-                                    <a href="/news/?category=research">科研进展</a>
-                                    <a href="/news/?category=health">健康科普</a>
-                                </div>
-                            </li>
-                            
-                            <li class="dropdown <?php echo $currentPage == 'hospitals' ? 'active' : ''; ?>">
-                                <a href="/hospitals/">
-                                    <i class="fas fa-hospital"></i>
-                                    <span>医院频道</span>
-                                    <i class="fas fa-chevron-down arrow"></i>
-                                </a>
-                                <div class="dropdown-menu mega-menu">
-                                    <div class="menu-section">
-                                        <h4>按科室查找</h4>
-                                        <?php
-                                        $mainCategories = getCategories(0);
-                                        foreach (array_slice($mainCategories, 0, 8) as $category):
-                                        ?>
-                                        <a href="/hospitals/?category=<?php echo $category['id']; ?>">
-                                            <?php echo h($category['name']); ?>
-                                        </a>
-                                        <?php endforeach; ?>
-                                    </div>
-                                    <div class="menu-section">
-                                        <h4>按地区查找</h4>
-                                        <a href="/hospitals/?city=北京">北京</a>
-                                        <a href="/hospitals/?city=上海">上海</a>
-                                        <a href="/hospitals/?city=广州">广州</a>
-                                        <a href="/hospitals/?city=深圳">深圳</a>
-                                    </div>
-                                    <div class="menu-section">
-                                        <h4>按等级查找</h4>
-                                        <a href="/hospitals/?level=三甲">三甲医院</a>
-                                        <a href="/hospitals/?level=三乙">三乙医院</a>
-                                        <a href="/hospitals/?level=专科">专科医院</a>
-                                    </div>
-                                </div>
-                            </li>
-                            
-                            <li class="dropdown <?php echo $currentPage == 'doctors' ? 'active' : ''; ?>">
-                                <a href="/doctors/">
-                                    <i class="fas fa-user-md"></i>
-                                    <span>医生频道</span>
-                                    <i class="fas fa-chevron-down arrow"></i>
-                                </a>
-                                <div class="dropdown-menu mega-menu">
-                                    <div class="menu-section">
-                                        <h4>按科室查找</h4>
-                                        <?php foreach (array_slice($mainCategories, 0, 8) as $category): ?>
-                                        <a href="/doctors/?category=<?php echo $category['id']; ?>">
-                                            <?php echo h($category['name']); ?>
-                                        </a>
-                                        <?php endforeach; ?>
-                                    </div>
-                                    <div class="menu-section">
-                                        <h4>按职称查找</h4>
-                                        <a href="/doctors/?title=主任医师">主任医师</a>
-                                        <a href="/doctors/?title=副主任医师">副主任医师</a>
-                                        <a href="/doctors/?title=主治医师">主治医师</a>
-                                    </div>
-                                </div>
-                            </li>
-                            
-                            <li class="dropdown <?php echo $currentPage == 'diseases' ? 'active' : ''; ?>">
-                                <a href="/diseases/">
-                                    <i class="fas fa-book-medical"></i>
-                                    <span>疾病百科</span>
-                                    <i class="fas fa-chevron-down arrow"></i>
-                                </a>
-                                <div class="dropdown-menu mega-menu">
-                                    <div class="menu-section">
-                                        <h4>常见疾病</h4>
-                                        <a href="/diseases/?category=11">心血管疾病</a>
-                                        <a href="/diseases/?category=12">呼吸系统</a>
-                                        <a href="/diseases/?category=13">消化系统</a>
-                                        <a href="/diseases/?category=14">内分泌科</a>
-                                    </div>
-                                    <div class="menu-section">
-                                        <h4>专科疾病</h4>
-                                        <a href="/diseases/?category=3">妇科疾病</a>
-                                        <a href="/diseases/?category=4">儿科疾病</a>
-                                        <a href="/diseases/?category=5">骨科疾病</a>
-                                        <a href="/diseases/?category=6">皮肤疾病</a>
-                                    </div>
-                                </div>
-                            </li>
-                            
-                            <li class="dropdown <?php echo $currentPage == 'qa' ? 'active' : ''; ?>">
-                                <a href="/qa/">
-                                    <i class="fas fa-question-circle"></i>
-                                    <span>健康问答</span>
-                                    <i class="fas fa-chevron-down arrow"></i>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a href="/qa/">最新问题</a>
-                                    <a href="/qa/hot.php">热门问题</a>
-                                    <a href="/qa/ask.php">我要提问</a>
-                                    <a href="/qa/experts.php">专家解答</a>
-                                </div>
                             </li>
                         </ul>
                     </div>
@@ -220,21 +110,6 @@
             <div class="mobile-menu-content">
                 <a href="/" class="menu-item">
                     <i class="fas fa-home"></i> 首页
-                </a>
-                <a href="/news/" class="menu-item">
-                    <i class="fas fa-newspaper"></i> 健康头条
-                </a>
-                <a href="/hospitals/" class="menu-item">
-                    <i class="fas fa-hospital"></i> 医院频道
-                </a>
-                <a href="/doctors/" class="menu-item">
-                    <i class="fas fa-user-md"></i> 医生频道
-                </a>
-                <a href="/diseases/" class="menu-item">
-                    <i class="fas fa-book-medical"></i> 疾病百科
-                </a>
-                <a href="/qa/" class="menu-item">
-                    <i class="fas fa-question-circle"></i> 健康问答
                 </a>
             </div>
         </div>
