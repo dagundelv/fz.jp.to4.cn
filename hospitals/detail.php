@@ -76,8 +76,9 @@ $relatedHospitals = $db->fetchAll("
     LIMIT 4
 ", [$hospital['city'], $hospitalId]);
 
-// 添加页面特定的CSS
+// 添加页面特定的CSS和JS
 $pageCSS = ['/assets/css/hospitals.css'];
+$pageJS = ['/assets/js/favorites.js'];
 
 include '../templates/header.php';
 ?>

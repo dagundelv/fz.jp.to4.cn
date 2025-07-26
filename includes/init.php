@@ -14,6 +14,9 @@ require_once __DIR__ . '/Database.php';
 // 包含通用函数
 require_once __DIR__ . '/functions.php';
 
+// 包含邮件服务
+require_once __DIR__ . '/EmailService.php';
+
 // 初始化数据库连接
 $db = Database::getInstance();
 

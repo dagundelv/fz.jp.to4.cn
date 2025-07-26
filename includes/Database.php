@@ -69,12 +69,20 @@ class Database {
     // 更新数据
     public function update($table, $data, $where, $whereParams = []) {
         $set = [];
+        $paramIndex = 0;
+        $allParams = [];
+        
+        // 构建SET子句，使用位置参数
         foreach ($data as $field => $value) {
-            $set[] = "`{$field}` = :{$field}";
+            $set[] = "`{$field}` = ?";
+            $allParams[] = $value;
+            $paramIndex++;
         }
+        
         $sql = "UPDATE `{$table}` SET " . implode(', ', $set) . " WHERE {$where}";
         
-        $params = array_merge($data, $whereParams);
+        // 合并WHERE参数
+        $params = array_merge($allParams, $whereParams);
         return $this->query($sql, $params);
     }
     

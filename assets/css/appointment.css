@@ -1,0 +1,656 @@
+/* 预约系统样式 */
+
+.appointment-page {
+    background: #f8fafc;
+    min-height: 100vh;
+    padding: 30px 0;
+}
+
+/* 布局 */
+.appointment-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* 医生信息卡片 */
+.doctor-info-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    position: sticky;
+    top: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.doctor-header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    padding: 25px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.doctor-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.doctor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 28px;
+}
+
+.doctor-details h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.doctor-title {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.doctor-category {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.doctor-rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: white;
+}
+
+.doctor-rating i {
+    color: #fbbf24;
+    font-size: 14px;
+}
+
+.doctor-rating span {
+    margin-left: 5px;
+    font-weight: 600;
+}
+
+/* 信息区块 */
+.hospital-info,
+.fee-info,
+.appointment-tips {
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.hospital-info:last-child,
+.fee-info:last-child,
+.appointment-tips:last-child {
+    border-bottom: none;
+}
+
+.hospital-info h4,
+.fee-info h4,
+.appointment-tips h4 {
+    margin: 0 0 15px 0;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hospital-info h4 i,
+.fee-info h4 i,
+.appointment-tips h4 i {
+    color: #4f46e5;
+}
+
+.info-item {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-item strong {
+    color: #6b7280;
+    margin-right: 8px;
+}
+
+.info-item span {
+    color: #1f2937;
+}
+
+.fee-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 5px;
+}
+
+.fee-note {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.appointment-tips ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.appointment-tips ul li {
+    margin-bottom: 5px;
+}
+
+/* 预约表单区域 */
+.appointment-form-section {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form-header {
+    background: #f9fafb;
+    padding: 30px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.form-header h2 {
+    margin: 0 0 10px 0;
+    color: #1f2937;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.form-header h2 i {
+    color: #4f46e5;
+}
+
+.form-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.appointment-form {
+    padding: 40px;
+}
+
+.form-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.form-section h3 {
+    margin: 0 0 25px 0;
+    color: #1f2937;
+    font-size: 18px;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+/* 日期选择 */
+.date-selection {
+    margin-bottom: 30px;
+}
+
+.date-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.date-option {
+    cursor: pointer;
+}
+
+.date-option input[type="radio"] {
+    display: none;
+}
+
+.date-card {
+    padding: 15px;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.date-option:hover .date-card {
+    border-color: #4f46e5;
+    background: #eef2ff;
+}
+
+.date-option input[type="radio"]:checked + .date-card {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: white;
+}
+
+.date-day {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.date-weekday {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* 时间选择 */
+.time-selection {
+    margin-bottom: 20px;
+}
+
+.time-period {
+    margin-bottom: 25px;
+}
+
+.time-period h4 {
+    margin: 0 0 15px 0;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.time-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+}
+
+.time-option {
+    cursor: pointer;
+}
+
+.time-option input[type="radio"] {
+    display: none;
+}
+
+.time-card {
+    padding: 10px;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.time-option:hover .time-card {
+    border-color: #4f46e5;
+    background: #eef2ff;
+}
+
+.time-option input[type="radio"]:checked + .time-card {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: white;
+}
+
+.time-card.disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+    border-color: #d1d5db;
+}
+
+.time-option:has(input:disabled) {
+    cursor: not-allowed;
+}
+
+.time-option:has(input:disabled) .time-card {
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-color: #d1d5db;
+}
+
+/* 表单样式 */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-control.error {
+    border-color: #ef4444;
+}
+
+.form-help {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.checkbox-label:hover {
+    border-color: #4f46e5;
+    background: #f8fafc;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-top: 2px;
+}
+
+.checkbox-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.checkbox-text i {
+    color: #f59e0b;
+    font-size: 16px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* 按钮样式 */
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.btn-large {
+    padding: 15px 30px;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background: #4f46e5;
+    color: white;
+    border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.btn-outline {
+    background: white;
+    color: #6b7280;
+    border-color: #e5e7eb;
+}
+
+.btn-outline:hover {
+    background: #f9fafb;
+    color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+/* 消息提示 */
+.error-message {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.error-message i {
+    color: #ef4444;
+}
+
+/* 消息提示样式 */
+.message-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    max-width: 300px;
+}
+
+.message-success {
+    border-left: 4px solid #10b981;
+    background: #f0fdf4;
+}
+
+.message-error {
+    border-left: 4px solid #ef4444;
+    background: #fef2f2;
+}
+
+.message-info {
+    border-left: 4px solid #3b82f6;
+    background: #eff6ff;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .appointment-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .doctor-info-card {
+        position: static;
+        order: -1;
+    }
+    
+    .doctor-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .date-options {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .time-options {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .appointment-page {
+        padding: 20px 0;
+    }
+    
+    .appointment-form {
+        padding: 25px;
+    }
+    
+    .form-header {
+        padding: 25px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .date-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .time-options {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .hospital-info,
+    .fee-info,
+    .appointment-tips {
+        padding: 15px;
+    }
+    
+    .message-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .doctor-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .avatar-placeholder {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .date-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .time-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .date-card {
+        padding: 12px;
+    }
+    
+    .time-card {
+        padding: 8px;
+        font-size: 13px;
+    }
+    
+    .form-header h2 {
+        font-size: 20px;
+    }
+    
+    .form-section h3 {
+        font-size: 16px;
+    }
+}

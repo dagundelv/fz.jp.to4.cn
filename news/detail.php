@@ -71,8 +71,9 @@ $comments = $db->fetchAll("
     LIMIT 20
 ", [$articleId]);
 
-// 添加页面特定的CSS
+// 添加页面特定的CSS和JS
 $pageCSS = ['/assets/css/news.css'];
+$pageJS = ['/assets/js/favorites.js'];
 
 include '../templates/header.php';
 ?>

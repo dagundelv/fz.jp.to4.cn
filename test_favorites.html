@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收藏功能测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .favorite-btn { 
+            padding: 8px 16px; 
+            margin: 5px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            background: white; 
+            cursor: pointer; 
+        }
+        .favorite-btn.favorited { 
+            border-color: #dc2626; 
+            color: #dc2626; 
+        }
+        .favorite-btn.not-favorited { 
+            border-color: #6b7280; 
+            color: #6b7280; 
+        }
+        .result { 
+            margin-top: 10px; 
+            padding: 10px; 
+            background: #f0f0f0; 
+            border-radius: 4px; 
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>收藏功能测试页面</h1>
+    
+    <div class="test-section">
+        <h2>测试医生收藏</h2>
+        <button class="favorite-btn" data-type="doctor" data-id="1">
+            <i class="fas fa-heart"></i> 收藏医生1
+        </button>
+        <button class="favorite-btn" data-type="doctor" data-id="2">
+            <i class="fas fa-heart"></i> 收藏医生2
+        </button>
+        <div class="result" id="doctor-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试医院收藏</h2>
+        <button class="favorite-btn" data-type="hospital" data-id="1">
+            <i class="fas fa-heart"></i> 收藏医院1
+        </button>
+        <button class="favorite-btn" data-type="hospital" data-id="2">
+            <i class="fas fa-heart"></i> 收藏医院2
+        </button>
+        <div class="result" id="hospital-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试文章收藏</h2>
+        <button class="favorite-btn" data-type="article" data-id="1">
+            <i class="fas fa-heart"></i> 收藏文章1
+        </button>
+        <button class="favorite-btn" data-type="article" data-id="2">
+            <i class="fas fa-heart"></i> 收藏文章2
+        </button>
+        <div class="result" id="article-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>获取收藏列表</h2>
+        <button onclick="loadFavorites('all')">获取全部收藏</button>
+        <button onclick="loadFavorites('doctor')">获取医生收藏</button>
+        <button onclick="loadFavorites('hospital')">获取医院收藏</button>
+        <button onclick="loadFavorites('article')">获取文章收藏</button>
+        <div class="result" id="list-result"></div>
+    </div>
+
+    <script>
+        // 简单的收藏功能实现
+        $(document).ready(function() {
+            $('.favorite-btn').on('click', function() {
+                const $btn = $(this);
+                const itemType = $btn.data('type');
+                const itemId = $btn.data('id');
+                
+                // 发送收藏请求
+                $.ajax({
+                    url: '/api/favorites.php',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        action: 'toggle',
+                        item_type: itemType,
+                        item_id: itemId
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            updateButton($btn, response.favorited);
+                            $(`#${itemType}-result`).html(`
+                                <strong>操作成功:</strong> ${response.message}<br>
+                                <strong>收藏状态:</strong> ${response.favorited ? '已收藏' : '未收藏'}<br>
+                                <strong>总收藏数:</strong> ${response.total_favorites}
+                            `);
+                        } else {
+                            $(`#${itemType}-result`).html(`<strong>操作失败:</strong> ${response.message}`);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $(`#${itemType}-result`).html(`<strong>请求失败:</strong> ${xhr.responseText || error}`);
+                    }
+                });
+            });
+            
+            function updateButton($btn, favorited) {
+                if (favorited) {
+                    $btn.addClass('favorited').removeClass('not-favorited');
+                } else {
+                    $btn.addClass('not-favorited').removeClass('favorited');
+                }
+            }
+        });
+        
+        function loadFavorites(type) {
+            $.ajax({
+                url: '/api/favorites.php',
+                method: 'GET',
+                data: { type: type, limit: 10 },
+                success: function(response) {
+                    if (response.success) {
+                        let html = `<strong>收藏列表 (${type}):</strong><br>`;
+                        html += `总数: ${response.total}<br><br>`;
+                        
+                        if (response.data.length > 0) {
+                            response.data.forEach(function(item) {
+                                const itemData = item.item_data;
+                                html += `<div style="margin: 10px 0; padding: 10px; background: white; border: 1px solid #ddd;">`;
+                                html += `<strong>类型:</strong> ${item.item_type}<br>`;
+                                html += `<strong>ID:</strong> ${item.item_id}<br>`;
+                                if (itemData) {
+                                    html += `<strong>名称:</strong> ${itemData.name || itemData.title || '未知'}<br>`;
+                                }
+                                html += `<strong>收藏时间:</strong> ${item.created_at}<br>`;
+                                html += `</div>`;
+                            });
+                        } else {
+                            html += '<div>暂无收藏内容</div>';
+                        }
+                        
+                        $('#list-result').html(html);
+                    } else {
+                        $('#list-result').html(`<strong>获取失败:</strong> ${response.message}`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#list-result').html(`<strong>请求失败:</strong> ${xhr.responseText || error}`);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

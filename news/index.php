@@ -13,11 +13,14 @@ $pageKeywords = "健康资讯,医疗新闻,医学进展,健康科普,医疗政�
 
 // 获取分类信息
 $categoryInfo = null;
-if ($category) {
-    $categoryInfo = getCategoryById($category);
+if ($category && is_numeric($category)) {
+    $categoryInfo = getCategoryById(intval($category));
     if ($categoryInfo) {
         $pageTitle = $categoryInfo['name'] . "资讯 - " . SITE_NAME;
         $pageDescription = $categoryInfo['description'] ?: $pageDescription;
+    } else {
+        // 如果分类不存在，重置category参数
+        $category = '';
     }
 }
 
@@ -30,22 +33,27 @@ if ($category) {
     $newsParams[] = $category;
 }
 
+// 先获取总数
+$totalNews = $db->fetch("
+    SELECT COUNT(*) as count
+    FROM articles a 
+    WHERE a.status = 'published' {$newsFilter}
+", $newsParams)['count'];
+
+$totalPages = ceil($totalNews / $pageSize);
+
+// 再获取分页数据
 $offset = ($page - 1) * $pageSize;
-$newsParams[] = $pageSize;
-$newsParams[] = $offset;
+$listParams = array_merge($newsParams, [$pageSize, $offset]);
 
 $newsList = $db->fetchAll("
-    SELECT a.*, c.name as category_name,
-           COUNT(*) OVER() as total_count
+    SELECT a.*, c.name as category_name
     FROM articles a 
     LEFT JOIN categories c ON a.category_id = c.id
     WHERE a.status = 'published' {$newsFilter}
     ORDER BY a.is_featured DESC, a.publish_time DESC
     LIMIT ? OFFSET ?
-", $newsParams);
-
-$totalNews = $newsList ? $newsList[0]['total_count'] : 0;
-$totalPages = ceil($totalNews / $pageSize);
+", $listParams);
 
 // 获取热门新闻
 $hotNews = $db->fetchAll("

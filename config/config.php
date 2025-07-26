@@ -43,6 +43,14 @@ if (DEBUG_MODE) {
     ini_set('display_errors', 0);
 }
 
+// 邮件配置
+define('EMAIL_HOST', 'localhost');
+define('EMAIL_PORT', 25);
+define('EMAIL_USERNAME', '');
+define('EMAIL_PASSWORD', '');
+define('EMAIL_FROM', 'noreply@fz.jp.to4.cn');
+define('EMAIL_FROM_NAME', SITE_NAME);
+
 // 时区设置
 date_default_timezone_set('Asia/Shanghai');
 
