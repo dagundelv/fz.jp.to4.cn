@@ -396,100 +396,18 @@ function getSiteStats() {
     ];
 }
 
-// 验证CSRF令牌
-function validateCSRFToken($token) {
-    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+// 获取分类列表
+function getCategories($parentId = 0) {
+    $db = Database::getInstance();
+    return $db->fetchAll(
+        "SELECT * FROM categories WHERE parent_id = ? AND status = 'active' ORDER BY sort_order ASC, id ASC",
+        [$parentId]
+    );
 }
 
-// 生成CSRF令牌
-function generateCSRFToken() {
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    return $_SESSION['csrf_token'];
-}
-
-// 验证邮箱格式
-function validateEmail($email) {
-    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-}
-
-// 验证手机号格式
-function validatePhone($phone) {
-    return preg_match('/^1[3-9]\d{9}$/', $phone);
-}
-
-// 清理输入数据
-function sanitizeInput($input) {
-    if (is_array($input)) {
-        return array_map('sanitizeInput', $input);
-    }
-    return trim(strip_tags($input));
-}
-
-// 验证文件上传安全性
-function validateUpload($file) {
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    $maxSize = 5 * 1024 * 1024; // 5MB
-    
-    if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
-        return ['valid' => false, 'message' => '文件上传失败'];
-    }
-    
-    if ($file['size'] > $maxSize) {
-        return ['valid' => false, 'message' => '文件大小超过限制'];
-    }
-    
-    if (!in_array($file['type'], $allowedTypes)) {
-        return ['valid' => false, 'message' => '不支持的文件类型'];
-    }
-    
-    // 检查文件内容
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = finfo_file($finfo, $file['tmp_name']);
-    finfo_close($finfo);
-    
-    if (!in_array($mimeType, $allowedTypes)) {
-        return ['valid' => false, 'message' => '文件内容与扩展名不匹配'];
-    }
-    
-    return ['valid' => true, 'message' => '文件验证通过'];
-}
-
-// 生成安全的文件名
-function generateSecureFilename($originalName) {
-    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
-    $basename = pathinfo($originalName, PATHINFO_FILENAME);
-    $safeBasename = preg_replace('/[^a-zA-Z0-9\-_]/', '', $basename);
-    $timestamp = time();
-    $random = bin2hex(random_bytes(4));
-    
-    return $safeBasename . '_' . $timestamp . '_' . $random . '.' . $extension;
-}
-
-// 限制请求频率
-function rateLimitCheck($key, $maxRequests = 60, $timeWindow = 3600) {
-    $cacheKey = 'rate_limit_' . $key;
-    
-    if (!isset($_SESSION[$cacheKey])) {
-        $_SESSION[$cacheKey] = ['count' => 0, 'start_time' => time()];
-    }
-    
-    $rateData = $_SESSION[$cacheKey];
-    
-    // 重置计数器如果时间窗口已过
-    if (time() - $rateData['start_time'] > $timeWindow) {
-        $_SESSION[$cacheKey] = ['count' => 1, 'start_time' => time()];
-        return true;
-    }
-    
-    // 检查是否超过限制
-    if ($rateData['count'] >= $maxRequests) {
-        return false;
-    }
-    
-    // 增加计数
-    $_SESSION[$cacheKey]['count']++;
-    return true;
+// 根据ID获取分类
+function getCategoryById($id) {
+    $db = Database::getInstance();
+    return $db->fetch("SELECT * FROM categories WHERE id = ? AND status = 'active'", [$id]);
 }
 ?>

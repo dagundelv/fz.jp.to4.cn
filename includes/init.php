@@ -27,7 +27,12 @@ header('X-Frame-Options: DENY');
 header('X-XSS-Protection: 1; mode=block');
 
 // 获取当前用户信息（如果已登录）
-$currentUser = getCurrentUser();
+try {
+    $currentUser = getCurrentUser();
+} catch (Exception $e) {
+    // 如果获取用户信息失败，设为null
+    $currentUser = null;
+}
 
 // 页面标题和描述的默认值
 $pageTitle = SITE_NAME;
@@ -45,129 +50,5 @@ if (!empty($queryString)) {
     parse_str($queryString, $urlParams);
 }
 
-// 常用的SQL查询函数
-function getCategories($parentId = 0) {
-    global $db;
-    return $db->fetchAll(
-        "SELECT * FROM categories WHERE parent_id = ? ORDER BY sort_order ASC, id ASC",
-        [$parentId]
-    );
-}
-
-function getCategoryById($id) {
-    global $db;
-    return $db->fetch("SELECT * FROM categories WHERE id = ?", [$id]);
-}
-
-function getCategoryTree() {
-    global $db;
-    $categories = $db->fetchAll("SELECT * FROM categories ORDER BY parent_id ASC, sort_order ASC, id ASC");
-    
-    $tree = [];
-    $lookup = [];
-    
-    // 第一遍：创建所有节点
-    foreach ($categories as $category) {
-        $category['children'] = [];
-        $lookup[$category['id']] = $category;
-    }
-    
-    // 第二遍：构建树形结构
-    foreach ($lookup as $id => $category) {
-        if ($category['parent_id'] == 0) {
-            $tree[] = &$lookup[$id];
-        } else {
-            if (isset($lookup[$category['parent_id']])) {
-                $lookup[$category['parent_id']]['children'][] = &$lookup[$id];
-            }
-        }
-    }
-    
-    return $tree;
-}
-
-// 获取热门搜索词
-function getPopularSearches($limit = 8) {
-    return getHotSearchKeywords($limit);
-}
-
-// 统计函数
-function getSiteStats() {
-    global $db;
-    
-    $stats = [
-        'hospitals' => $db->count('hospitals', "status = 'active'"),
-        'doctors' => $db->count('doctors', "status = 'active'"),
-        'articles' => $db->count('articles', "status = 'published'"),
-        'questions' => $db->count('questions', "status = 'active'"),
-        'users' => $db->count('users', "status = 'active'")
-    ];
-    
-    return $stats;
-}
-
-// 获取最新文章
-function getLatestArticles($limit = 10, $categoryId = null) {
-    global $db;
-    
-    $sql = "SELECT a.*, c.name as category_name 
-            FROM articles a 
-            LEFT JOIN categories c ON a.category_id = c.id 
-            WHERE a.status = 'published'";
-    $params = [];
-    
-    if ($categoryId) {
-        $sql .= " AND a.category_id = ?";
-        $params[] = $categoryId;
-    }
-    
-    $sql .= " ORDER BY a.publish_time DESC LIMIT ?";
-    $params[] = $limit;
-    
-    return $db->fetchAll($sql, $params);
-}
-
-// 获取推荐医生
-function getFeaturedDoctors($limit = 10, $categoryId = null) {
-    global $db;
-    
-    $sql = "SELECT d.*, h.name as hospital_name, c.name as category_name 
-            FROM doctors d 
-            LEFT JOIN hospitals h ON d.hospital_id = h.id 
-            LEFT JOIN categories c ON d.category_id = c.id 
-            WHERE d.status = 'active' AND h.status = 'active'";
-    $params = [];
-    
-    if ($categoryId) {
-        $sql .= " AND d.category_id = ?";
-        $params[] = $categoryId;
-    }
-    
-    $sql .= " ORDER BY d.rating DESC, d.view_count DESC LIMIT ?";
-    $params[] = $limit;
-    
-    return $db->fetchAll($sql, $params);
-}
-
-// 获取热门问题
-function getHotQuestions($limit = 10, $categoryId = null) {
-    global $db;
-    
-    $sql = "SELECT q.*, u.username, c.name as category_name 
-            FROM questions q 
-            LEFT JOIN users u ON q.user_id = u.id 
-            LEFT JOIN categories c ON q.category_id = c.id 
-            WHERE q.status = 'active'";
-    $params = [];
-    
-    if ($categoryId) {
-        $sql .= " AND q.category_id = ?";
-        $params[] = $categoryId;
-    }
-    
-    $sql .= " ORDER BY q.view_count DESC, q.created_at DESC LIMIT ?";
-    $params[] = $limit;
-    
-    return $db->fetchAll($sql, $params);
-}
+// 所有函数现在都在functions.php中定义，避免重复定义
 ?>
