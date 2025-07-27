@@ -255,6 +255,7 @@ include '../templates/header.php';
 /* 继承登录页面的基础样式 */
 .required {
     color: #ef4444;
+    font-weight: 600;
 }
 
 .form-help {
@@ -262,6 +263,10 @@ include '../templates/header.php';
     font-size: 12px;
     color: #6b7280;
     line-height: 1.4;
+}
+
+.auth-form .form-control {
+    box-sizing: border-box;
 }
 
 .password-strength {

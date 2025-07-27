@@ -17,14 +17,39 @@ if ($query) {
     recordSearchKeyword($query, $category);
 }
 
+// 获取筛选参数
+$filters = [
+    'level' => $_GET['level'] ?? '',
+    'city' => $_GET['city'] ?? '',
+    'category_id' => $_GET['category_id'] ?? '',
+    'hospital_id' => $_GET['hospital_id'] ?? '',
+    'title' => $_GET['title'] ?? '',
+    'sort' => $_GET['sort'] ?? 'relevance'
+];
+
 // 执行搜索
 $searchResults = [];
 $totalResults = 0;
 
 if ($query) {
-    $searchResults = performSearch($query, $category, $page, $pageSize);
+    // 使用智能搜索引擎
+    require_once 'includes/SearchEngine.php';
+    $searchEngine = new SearchEngine();
+    
+    $searchResults = $searchEngine->search($query, [
+        'category' => $category,
+        'page' => $page,
+        'limit' => $pageSize,
+        'sort' => $filters['sort'],
+        'filters' => $filters
+    ]);
+    
     $totalResults = $searchResults['total'] ?? 0;
 }
+
+// 添加页面特定的CSS和JS
+$pageCSS = ['/assets/css/search.css'];
+$pageJS = ['/assets/js/search-enhanced.js'];
 
 include 'templates/header.php';
 
@@ -164,15 +189,136 @@ function performSearch($query, $category, $page, $pageSize) {
             <?php if ($query): ?>
                 <div class="search-info">
                     <p>搜索"<strong><?php echo h($query); ?></strong>"的结果，共找到 <strong><?php echo number_format($totalResults); ?></strong> 条相关信息</p>
+                    <?php if (empty($query)): ?>
+                        <p style="color: red;">搜索查询为空</p>
+                    <?php elseif ($totalResults === 0): ?>
+                        <p style="color: orange;">没有找到匹配的结果</p>
+                    <?php else: ?>
+                        <p style="color: green;">找到结果：<?php echo count($searchResults['hospitals'] ?? []) + count($searchResults['doctors'] ?? []) + count($searchResults['diseases'] ?? []) + count($searchResults['articles'] ?? []) + count($searchResults['questions'] ?? []); ?> 项</p>
+                        <!-- 调试信息 -->
+                        <small style="color: gray;">
+                            医院: <?php echo count($searchResults['hospitals'] ?? []); ?>, 
+                            医生: <?php echo count($searchResults['doctors'] ?? []); ?>, 
+                            疾病: <?php echo count($searchResults['diseases'] ?? []); ?>, 
+                            文章: <?php echo count($searchResults['articles'] ?? []); ?>,
+                            问答: <?php echo count($searchResults['questions'] ?? []); ?>
+                        </small>
+                    <?php endif; ?>
+                </div>
+            <?php elseif (isset($_GET['q'])): ?>
+                <div class="search-info">
+                    <p style="color: red;">请输入搜索关键词</p>
                 </div>
             <?php endif; ?>
         </div>
         
         <?php if ($query && $totalResults > 0): ?>
+            <!-- 高级筛选 -->
+            <div class="advanced-filters">
+                <div class="filter-header">
+                    <h3><i class="fas fa-filter"></i> 筛选条件</h3>
+                    <button class="toggle-filters" id="toggleFilters">
+                        <span>展开筛选</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                
+                <div class="filter-content" id="filterContent" style="display: none;">
+                    <form method="GET" action="/search.php" class="filter-form">
+                        <input type="hidden" name="q" value="<?php echo h($query); ?>">
+                        <?php if ($category): ?>
+                            <input type="hidden" name="category" value="<?php echo h($category); ?>">
+                        <?php endif; ?>
+                        
+                        <div class="filter-grid">
+                            <!-- 排序方式 -->
+                            <div class="filter-group">
+                                <label>排序方式</label>
+                                <select name="sort" class="filter-select">
+                                    <option value="relevance" <?php echo $filters['sort'] === 'relevance' ? 'selected' : ''; ?>>相关性</option>
+                                    <option value="rating" <?php echo $filters['sort'] === 'rating' ? 'selected' : ''; ?>>评分</option>
+                                    <option value="time" <?php echo $filters['sort'] === 'time' ? 'selected' : ''; ?>>时间</option>
+                                </select>
+                            </div>
+                            
+                            <?php if (!$category || $category === 'hospitals'): ?>
+                                <!-- 医院等级 -->
+                                <div class="filter-group">
+                                    <label>医院等级</label>
+                                    <select name="level" class="filter-select">
+                                        <option value="">不限</option>
+                                        <option value="三甲" <?php echo $filters['level'] === '三甲' ? 'selected' : ''; ?>>三甲医院</option>
+                                        <option value="三乙" <?php echo $filters['level'] === '三乙' ? 'selected' : ''; ?>>三乙医院</option>
+                                        <option value="二甲" <?php echo $filters['level'] === '二甲' ? 'selected' : ''; ?>>二甲医院</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- 城市 -->
+                                <div class="filter-group">
+                                    <label>城市</label>
+                                    <select name="city" class="filter-select">
+                                        <option value="">不限</option>
+                                        <option value="北京" <?php echo $filters['city'] === '北京' ? 'selected' : ''; ?>>北京</option>
+                                        <option value="上海" <?php echo $filters['city'] === '上海' ? 'selected' : ''; ?>>上海</option>
+                                        <option value="广州" <?php echo $filters['city'] === '广州' ? 'selected' : ''; ?>>广州</option>
+                                        <option value="深圳" <?php echo $filters['city'] === '深圳' ? 'selected' : ''; ?>>深圳</option>
+                                    </select>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <?php if (!$category || $category === 'doctors'): ?>
+                                <!-- 医生职称 -->
+                                <div class="filter-group">
+                                    <label>医生职称</label>
+                                    <select name="title" class="filter-select">
+                                        <option value="">不限</option>
+                                        <option value="主任医师" <?php echo $filters['title'] === '主任医师' ? 'selected' : ''; ?>>主任医师</option>
+                                        <option value="副主任医师" <?php echo $filters['title'] === '副主任医师' ? 'selected' : ''; ?>>副主任医师</option>
+                                        <option value="主治医师" <?php echo $filters['title'] === '主治医师' ? 'selected' : ''; ?>>主治医师</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- 科室 -->
+                                <div class="filter-group">
+                                    <label>科室</label>
+                                    <select name="category_id" class="filter-select">
+                                        <option value="">不限</option>
+                                        <?php 
+                                        try {
+                                            $categories = $db->fetchAll("SELECT id, name FROM categories WHERE status = 'active' ORDER BY sort_order, name");
+                                            foreach ($categories as $cat):
+                                        ?>
+                                            <option value="<?php echo $cat['id']; ?>" <?php echo $filters['category_id'] == $cat['id'] ? 'selected' : ''; ?>>
+                                                <?php echo h($cat['name']); ?>
+                                            </option>
+                                        <?php 
+                                            endforeach;
+                                        } catch (Exception $e) {
+                                            // 如果查询失败，显示错误但不中断页面
+                                            echo '<option value="">数据加载失败</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> 应用筛选
+                            </button>
+                            <a href="/search.php?q=<?php echo urlencode($query); ?><?php echo $category ? '&category=' . urlencode($category) : ''; ?>" class="btn btn-outline">
+                                <i class="fas fa-undo"></i> 重置
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
             <!-- 搜索结果筛选 -->
             <div class="search-filters">
                 <div class="filter-tabs">
-                    <a href="/search.php?q=<?php echo urlencode($query); ?>" 
+                    <a href="/search.php?q=<?php echo urlencode($query); ?><?php echo http_build_query(array_filter($filters)) ? '&' . http_build_query(array_filter($filters)) : ''; ?>" 
                        class="filter-tab <?php echo !$category ? 'active' : ''; ?>">
                         全部 (<?php echo number_format($totalResults); ?>)
                     </a>
@@ -488,5 +634,44 @@ function performSearch($query, $category, $page, $pageSize) {
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+// 筛选功能
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleFilters = document.getElementById('toggleFilters');
+    const filterContent = document.getElementById('filterContent');
+    
+    if (toggleFilters && filterContent) {
+        toggleFilters.addEventListener('click', function() {
+            const isVisible = filterContent.style.display !== 'none';
+            
+            if (isVisible) {
+                filterContent.style.display = 'none';
+                toggleFilters.querySelector('span').textContent = '展开筛选';
+                toggleFilters.querySelector('i').className = 'fas fa-chevron-down';
+            } else {
+                filterContent.style.display = 'block';
+                toggleFilters.querySelector('span').textContent = '收起筛选';
+                toggleFilters.querySelector('i').className = 'fas fa-chevron-up';
+            }
+        });
+        
+        // 如果有筛选条件，自动展开
+        const hasFilters = <?php echo json_encode(array_filter($filters)); ?>;
+        if (Object.keys(hasFilters).length > 1) { // 除了sort之外还有其他筛选
+            toggleFilters.click();
+        }
+    }
+    
+    // 筛选表单自动提交
+    const filterSelects = document.querySelectorAll('.filter-select');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            // 可选：自动提交表单
+            // this.form.submit();
+        });
+    });
+});
+</script>
 
 <?php include 'templates/footer.php'; ?>

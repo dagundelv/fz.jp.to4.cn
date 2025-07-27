@@ -1,5 +1,88 @@
 /* 预约系统样式 */
 
+/* 时间选择加载状态 */
+.time-options.loading {
+    position: relative;
+    opacity: 0.6;
+}
+
+.time-options.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #007bff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 时间卡片状态 */
+.time-card {
+    transition: all 0.3s ease;
+}
+
+.time-card.available {
+    background-color: #e8f5e8;
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.time-card.disabled {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.time-card.disabled:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+/* 消息提示 */
+.message-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+}
+
+.message-success {
+    background-color: #28a745;
+}
+
+.message-error {
+    background-color: #dc3545;
+}
+
+.message-info {
+    background-color: #17a2b8;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 .appointment-page {
     background: #f8fafc;
     min-height: 100vh;

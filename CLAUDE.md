@@ -16,24 +16,42 @@ This is a comprehensive health/medical website built with PHP 7.4 and MySQL, des
 
 ## Architecture and File Structure
 
-### Core Configuration Files
-- `config/config.php` - Main configuration including database settings and site constants
-- `includes/init.php` - Initialization file that should be included in all PHP pages
-- `includes/Database.php` - Database connection class using singleton pattern
-- `includes/functions.php` - Common utility functions
+### Core Architecture
+
+**Configuration Layer**
+- `config/config.php` - Main configuration with database, upload, and security settings
+- `includes/init.php` - Bootstrap file that initializes all core components
+
+**Data Layer** 
+- `includes/Database.php` - PDO-based singleton database class with CRUD operations
+- `includes/cache.php` - CacheManager supporting file and Redis caching
+- `database.sql` - Complete MySQL schema
+
+**Service Layer**
+- `includes/functions.php` - Common utility functions and business logic
+- `includes/performance.php` - PerformanceOptimizer with compression, lazy loading
+- `includes/seo.php` - SEO optimization utilities
+- `includes/EmailService.php` - Email functionality
+
+**Presentation Layer**
+- Template system using `templates/header.php` and `templates/footer.php`
+- Modular page structure (index.php, search.php, etc.)
+- API endpoints in `/api/` directory
 
 ### Database Schema
 - `database.sql` - Complete database schema with tables for users, hospitals, doctors, diseases, articles, Q&A, etc.
 - **Key Tables**: users, hospitals, doctors, diseases, articles, questions, answers, categories, favorites, appointments
 
 ### Frontend Structure
-- `index.php` - Main homepage (converted from HTML to PHP)
+- `index.php` - Main homepage with modern redesigned layout
 - `search.php` - Search functionality with intelligent suggestions
-- `templates/header.php` - Common header template with navigation
+- `templates/header.php` - Common header template with enhanced navigation and user dropdown
 - `templates/footer.php` - Common footer template
 - `assets/css/style.css` - Main stylesheet with comprehensive styling
+- `assets/css/homepage-new.css` - New homepage design styles with modern cards and animations
+- `assets/css/dropdown-fix.css` - Navigation dropdown menu fix for z-index issues
 - `assets/css/responsive.css` - Responsive design rules
-- `assets/js/main.js` - Core JavaScript functionality
+- `assets/js/main.js` - Core JavaScript with enhanced carousel and animations
 - `assets/js/search.js` - Advanced search features
 
 ### API Endpoints
@@ -45,17 +63,37 @@ This is a comprehensive health/medical website built with PHP 7.4 and MySQL, des
 
 ## Development Commands
 
-### Database Setup
+### Local Development Setup
+```bash
+# Start PHP built-in server for development
+php -S localhost:8000
+
+# Or serve from the document root
+php -S localhost:8000 -t /www/wwwroot/fz.jp.to4.cn
+```
+
+### Database Operations
 ```bash
 # Import the database schema
 mysql -h 127.0.0.1 -u fz_jp_to4_cn -p fz_jp_to4_cn < database.sql
+
+# Backup database
+mysqldump -h 127.0.0.1 -u fz_jp_to4_cn -p fz_jp_to4_cn > backup_$(date +%Y%m%d_%H%M%S).sql
+```
+
+### Cache Management
+```bash
+# Clear file cache manually
+rm -rf cache/*.cache
+
+# Or use the admin interface at /admin/clear-cache.php
 ```
 
 ### File Permissions
 ```bash
-# Ensure upload directory is writable
-chmod 755 uploads/
-chmod 755 assets/
+# Ensure directories are writable
+chmod 755 uploads/ assets/ cache/
+chmod 644 config/config.php
 ```
 
 ## Key Features Implemented
@@ -84,20 +122,34 @@ chmod 755 assets/
 ## Working with this Repository
 
 ### Adding New Features
-1. Include `includes/init.php` at the top of new PHP files
-2. Use the Database singleton: `$db = Database::getInstance()`
-3. Follow the established template pattern with header/footer includes
-4. Use utility functions from `includes/functions.php`
+1. **Bootstrap**: Always include `includes/init.php` first - it initializes database, cache, performance optimization
+2. **Database**: Use singleton pattern `$db = Database::getInstance()` with prepared statements
+3. **Templates**: Follow header/footer pattern: `include 'templates/header.php'` and `include 'templates/footer.php'`
+4. **Caching**: Use helper functions `cache_remember($key, $callback, $ttl)` for expensive operations
+5. **Performance**: Use `PerformanceOptimizer::lazyImage()` for images, `asset_url()` for versioned assets
 
-### Database Operations
-- Use prepared statements via the Database class methods
-- Examples: `$db->fetchAll()`, `$db->insert()`, `$db->update()`
-- Always validate and sanitize user input
+### Core Development Patterns
 
-### Frontend Development
-- Follow the existing CSS class naming conventions
-- Use responsive design patterns from `responsive.css`
-- Implement AJAX calls using the patterns in `main.js`
+**Database Operations**
+```php
+// Query with caching
+$results = cache_remember('doctors_list', function() use ($db) {
+    return $db->fetchAll("SELECT * FROM doctors WHERE status = 'active'");
+}, 1800);
+
+// CRUD operations
+$id = $db->insert('users', $userData);
+$db->update('users', $updateData, 'id = ?', [$userId]);
+```
+
+**Performance Optimization**
+```php
+// Lazy loading images
+echo PerformanceOptimizer::lazyImage('/uploads/doctor.jpg', 'Doctor Name');
+
+// Deferred scripts
+echo PerformanceOptimizer::deferScript('/assets/js/main.js');
+```
 
 ### Security Considerations
 - User authentication checks with `isLoggedIn()` function

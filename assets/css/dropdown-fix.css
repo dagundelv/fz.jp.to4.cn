@@ -1,0 +1,132 @@
+/* 修复导航下拉菜单被遮盖问题 - 仅影响前台页面 */
+
+/* 限制修复样式作用域，避免影响后台 */
+body:not(.admin-body) .top-info-bar,
+body:not(.admin-body) .main-nav,
+body:not(.admin-body) .dropdown-menu,
+body:not(.admin-body) .user-dropdown,
+body:not(.admin-body) .search-suggestions {
+    /* 前台导航修复样式 */
+}
+
+/* 重新设置 z-index 层级 - 使用更高的层级确保用户下拉框不被遮挡 */
+/* 仅为前台页面应用下拉菜单修复 */
+body:not(.admin-body) .top-info-bar {
+    z-index: 1200;
+    overflow: visible;
+    position: relative;
+}
+
+body:not(.admin-body) .main-nav {
+    z-index: 1000;
+    overflow: visible;
+    position: relative;
+}
+
+/* 用户下拉框获得最高优先级，确保不被任何导航元素遮挡 */
+body:not(.admin-body) .user-dropdown {
+    z-index: 1300 !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    overflow: visible !important;
+    background: white !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 6px !important;
+}
+
+/* 主导航下拉菜单保持较低层级 */
+body:not(.admin-body) .main-nav .dropdown-menu,
+body:not(.admin-body) .nav-item .dropdown-menu {
+    z-index: 1010;
+    position: absolute;
+}
+
+/* 搜索建议保持中等层级 */
+body:not(.admin-body) .search-suggestions {
+    z-index: 1100;
+    position: absolute;
+}
+
+/* 确保导航容器不会剪切内容 */
+body:not(.admin-body) .main-nav .container,
+body:not(.admin-body) .top-info-bar .container {
+    overflow: visible !important;
+}
+
+/* 确保导航项目不会剪切下拉菜单 */
+body:not(.admin-body) .nav-item,
+body:not(.admin-body) .dropdown-item {
+    overflow: visible !important;
+}
+
+/* 特别处理用户下拉菜单 */
+body:not(.admin-body) .user-profile {
+    position: relative;
+    overflow: visible !important;
+}
+
+/* 移除重复的用户下拉框样式，使用上方统一设置 */
+
+/* 移除重复的搜索建议样式，使用上方统一设置 */
+
+/* 移除可能导致剪切的 transform 和 overflow 设置 */
+body:not(.admin-body) .main-nav *,
+body:not(.admin-body) .top-info-bar * {
+    transform: none !important;
+}
+
+/* 确保主要内容区域不会覆盖导航 */
+body:not(.admin-body) .main-content,
+body:not(.admin-body) .hero-section {
+    z-index: 1 !important;
+}
+
+/* 特别处理响应式菜单 */
+body:not(.admin-body) .mobile-menu {
+    z-index: 1003 !important;
+}
+
+/* 确保任何可能的父容器都不会剪切下拉菜单 */
+body:not(.admin-body) header,
+body:not(.admin-body) .main-header {
+    overflow: visible !important;
+    z-index: 1000 !important;
+}
+
+/* 添加更强的用户下拉框样式，防止被任何元素遮挡 */
+body:not(.admin-body) .user-profile {
+    position: relative !important;
+    z-index: 1250 !important;
+}
+
+body:not(.admin-body) .user-profile .user-dropdown {
+    position: absolute !important;
+    top: calc(100% + 5px) !important;
+    right: 0 !important;
+    z-index: 1350 !important;
+    min-width: 200px !important;
+    background: #ffffff !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    /* 默认隐藏状态 */
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateY(-10px) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 只有在悬停时才显示下拉菜单 */
+body:not(.admin-body) .user-profile:hover .user-dropdown {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+}
+
+/* 确保下拉菜单项目样式正确 */
+body:not(.admin-body) .user-dropdown .dropdown-item {
+    z-index: inherit !important;
+    position: relative !important;
+}

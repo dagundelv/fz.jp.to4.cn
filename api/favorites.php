@@ -135,6 +135,55 @@ try {
         $itemType = $input['item_type'] ?? '';
         $itemId = intval($input['item_id'] ?? 0);
         
+        // 处理收藏统计请求
+        if ($action === 'counts') {
+            $counts = [];
+            $types = ['doctor', 'hospital', 'article', 'question', 'disease'];
+            
+            foreach ($types as $type) {
+                $count = $db->fetchOne("
+                    SELECT COUNT(*) as count FROM user_favorites 
+                    WHERE user_id = ? AND item_type = ?
+                ", [$userId, $type])['count'] ?? 0;
+                $counts[$type] = $count;
+            }
+            
+            echo json_encode(['success' => true, 'data' => $counts]);
+            exit;
+        }
+        
+        // 处理批量删除请求
+        if ($action === 'batch_remove') {
+            $items = json_decode($input['items'] ?? '[]', true);
+            if (empty($items)) {
+                echo json_encode(['success' => false, 'message' => '没有选择要删除的项目']);
+                exit;
+            }
+            
+            $deleteCount = 0;
+            foreach ($items as $item) {
+                $type = $item['type'] ?? '';
+                $id = intval($item['id'] ?? 0);
+                
+                if ($type && $id) {
+                    $result = $db->execute("
+                        DELETE FROM user_favorites 
+                        WHERE user_id = ? AND item_type = ? AND item_id = ?
+                    ", [$userId, $type, $id]);
+                    
+                    if ($result) {
+                        $deleteCount++;
+                    }
+                }
+            }
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => "成功删除 {$deleteCount} 项收藏"
+            ]);
+            exit;
+        }
+        
         // 验证参数
         if (!in_array($action, ['add', 'remove', 'toggle', 'check'])) {
             http_response_code(400);

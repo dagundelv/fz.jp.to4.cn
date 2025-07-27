@@ -180,15 +180,47 @@
     </div>
     
     <!-- 全局JavaScript -->
-    <script src="/assets/js/main.js"></script>
-    <script src="/assets/js/search.js"></script>
+    <?php echo PerformanceOptimizer::deferScript(asset_url('/assets/js/notifications.js')); ?>
+    <?php echo PerformanceOptimizer::deferScript(asset_url('/assets/js/search-enhanced.js')); ?>
+    <?php echo PerformanceOptimizer::deferScript(asset_url('/assets/js/main.js')); ?>
+    <?php echo PerformanceOptimizer::deferScript(asset_url('/assets/js/search.js')); ?>
     
     <!-- 页面特定JavaScript -->
     <?php if (isset($pageJS)): ?>
         <?php foreach ($pageJS as $js): ?>
-            <script src="<?php echo $js; ?>"></script>
+            <?php echo PerformanceOptimizer::deferScript(asset_url($js)); ?>
         <?php endforeach; ?>
     <?php endif; ?>
+    
+    <!-- 懒加载支持 -->
+    <script>
+    // 在页面加载完成后初始化懒加载
+    document.addEventListener('DOMContentLoaded', function() {
+        // 懒加载图片
+        const lazyImages = document.querySelectorAll('.lazy-load');
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy-load');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+            
+            lazyImages.forEach(function(img) {
+                imageObserver.observe(img);
+            });
+        } else {
+            // 降级方案
+            lazyImages.forEach(function(img) {
+                img.src = img.dataset.src;
+            });
+        }
+    });
+    </script>
     
     <script>
     // 全局配置
@@ -198,5 +230,12 @@
         isLoggedIn: <?php echo isLoggedIn() ? 'true' : 'false'; ?>
     };
     </script>
+    
+    <?php
+    // 输出性能调试信息（仅开发环境）
+    if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+        perf()->debugPerformance(true);
+    }
+    ?>
 </body>
 </html>

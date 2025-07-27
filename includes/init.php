@@ -17,8 +17,20 @@ require_once __DIR__ . '/functions.php';
 // 包含邮件服务
 require_once __DIR__ . '/EmailService.php';
 
+// 包含缓存管理器
+require_once __DIR__ . '/cache.php';
+
+// 包含性能优化器
+require_once __DIR__ . '/performance.php';
+
+// 包含SEO优化器
+require_once __DIR__ . '/seo.php';
+
 // 初始化数据库连接
 $db = Database::getInstance();
+
+// 初始化性能优化
+init_performance_optimization();
 
 // 设置响应头
 header('Content-Type: text/html; charset=utf-8');

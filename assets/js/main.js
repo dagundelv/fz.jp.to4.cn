@@ -9,6 +9,9 @@ $(document).ready(function() {
     initTooltips();
     initSmoothScroll();
     
+    // 初始化扩展功能
+    initExtendedFeatures();
+    
     // 页面加载完成后的初始化
     $(window).on('load', function() {
         initAnimations();
@@ -55,6 +58,8 @@ function initMobileMenu() {
 function initHeroSlider() {
     const $slides = $('.hero-slide');
     const $indicators = $('.indicator');
+    const $prevBtn = $('.hero-prev');
+    const $nextBtn = $('.hero-next');
     let currentSlide = 0;
     let slideInterval;
     
@@ -62,7 +67,7 @@ function initHeroSlider() {
     
     // 开始自动轮播
     function startSlider() {
-        slideInterval = setInterval(nextSlide, 5000);
+        slideInterval = setInterval(nextSlide, 6000);
     }
     
     // 停止自动轮播
@@ -76,6 +81,12 @@ function initHeroSlider() {
         showSlide(currentSlide);
     }
     
+    // 上一张幻灯片
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + $slides.length) % $slides.length;
+        showSlide(currentSlide);
+    }
+    
     // 显示指定幻灯片
     function showSlide(index) {
         $slides.removeClass('active');
@@ -85,6 +96,23 @@ function initHeroSlider() {
         $indicators.eq(index).addClass('active');
         
         currentSlide = index;
+        
+        // 重置动画
+        const $activeSlide = $slides.eq(index);
+        $activeSlide.find('.animate-fade-up, .animate-fade-up-delay, .animate-fade-up-delay-2')
+                   .removeClass('animate-fade-up animate-fade-up-delay animate-fade-up-delay-2')
+                   .addClass('animate-fade-up');
+        
+        // 延迟添加动画类
+        setTimeout(() => {
+            $activeSlide.find('.hero-title').addClass('animate-fade-up');
+            setTimeout(() => {
+                $activeSlide.find('.hero-subtitle').addClass('animate-fade-up-delay');
+                setTimeout(() => {
+                    $activeSlide.find('.hero-actions').addClass('animate-fade-up-delay-2');
+                }, 300);
+            }, 300);
+        }, 100);
     }
     
     // 指示器点击事件
@@ -95,8 +123,65 @@ function initHeroSlider() {
         startSlider();
     });
     
+    // 导航按钮点击事件
+    $nextBtn.on('click', function() {
+        nextSlide();
+        stopSlider();
+        startSlider();
+    });
+    
+    $prevBtn.on('click', function() {
+        prevSlide();
+        stopSlider();
+        startSlider();
+    });
+    
+    // 键盘导航
+    $(document).on('keydown', function(e) {
+        if (e.keyCode === 37) { // 左箭头
+            prevSlide();
+            stopSlider();
+            startSlider();
+        } else if (e.keyCode === 39) { // 右箭头
+            nextSlide();
+            stopSlider();
+            startSlider();
+        }
+    });
+    
     // 鼠标悬停暂停轮播
     $('.hero-section').on('mouseenter', stopSlider).on('mouseleave', startSlider);
+    
+    // 触摸滑动支持
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    $('.hero-section').on('touchstart', function(e) {
+        touchStartX = e.originalEvent.touches[0].clientX;
+    });
+    
+    $('.hero-section').on('touchend', function(e) {
+        touchEndX = e.originalEvent.changedTouches[0].clientX;
+        handleSwipe();
+    });
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+            stopSlider();
+            startSlider();
+        }
+    }
+    
+    // 初始化第一张幻灯片动画
+    showSlide(0);
     
     // 开始轮播
     startSlider();
@@ -107,14 +192,14 @@ function initScrollEffects() {
     const $window = $(window);
     const $backToTop = $('.back-to-top');
     
-    // 返回顶部按钮
-    $window.on('scroll', function() {
+    // 返回顶部按钮 - 使用节流优化
+    $window.on('scroll', throttle(function() {
         if ($window.scrollTop() > 300) {
             $backToTop.addClass('visible');
         } else {
             $backToTop.removeClass('visible');
         }
-    });
+    }, 100));
     
     // 返回顶部点击事件
     $backToTop.on('click', function() {
@@ -127,7 +212,7 @@ function initScrollEffects() {
     let lastScrollTop = 0;
     const $navbar = $('.main-nav');
     
-    $window.on('scroll', function() {
+    $window.on('scroll', throttle(function() {
         const scrollTop = $window.scrollTop();
         
         if (scrollTop > 100) {
@@ -137,7 +222,7 @@ function initScrollEffects() {
         }
         
         lastScrollTop = scrollTop;
-    });
+    }, 100));
 }
 
 // 在线客服面板
@@ -226,7 +311,7 @@ function initAnimations() {
         });
     }
     
-    $(window).on('scroll', checkAnimation);
+    $(window).on('scroll', throttle(checkAnimation, 100));
     checkAnimation(); // 初始检查
 }
 
@@ -444,7 +529,7 @@ function throttle(func, limit) {
 
 // 收藏功能
 function toggleFavorite(type, id, $element) {
-    if (!window.SITE_CONFIG.isLoggedIn) {
+    if (!window.SITE_CONFIG || !window.SITE_CONFIG.isLoggedIn) {
         showMessage('请先登录', 'warning');
         return;
     }
@@ -477,7 +562,7 @@ function toggleFavorite(type, id, $element) {
 
 // 点赞功能
 function toggleLike(type, id, $element) {
-    if (!window.SITE_CONFIG.isLoggedIn) {
+    if (!window.SITE_CONFIG || !window.SITE_CONFIG.isLoggedIn) {
         showMessage('请先登录', 'warning');
         return;
     }
@@ -588,10 +673,338 @@ $(document).on('submit', 'form[data-ajax]', function(e) {
     });
 });
 
-// 初始化懒加载
-$(document).ready(function() {
+// 数字动画
+function animateCounters() {
+    $('.stat-number[data-count]').each(function() {
+        const $this = $(this);
+        const target = parseInt($this.data('count'));
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(function() {
+            current += step;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            $this.text(formatNumber(Math.floor(current)));
+        }, 16);
+    });
+}
+
+// 延迟初始化函数 - 合并到主要的ready函数中
+function initExtendedFeatures() {
+    // 初始化懒加载
     initLazyLoad();
-});
+    
+    // 初始化Q&A交互功能
+    if ($('.qa-filter-tabs').length) {
+        initQAInteractions();
+        initQACardEvents();
+    }
+    
+    // 添加统计数字动画到滚动检测中
+    const $statsSection = $('.stats-section');
+    if ($statsSection.length) {
+        let statsAnimated = false;
+        
+        $(window).on('scroll', throttle(function() {
+            if (!statsAnimated) {
+                const windowTop = $(window).scrollTop();
+                const windowBottom = windowTop + $(window).height();
+                const statsTop = $statsSection.offset().top;
+                
+                if (statsTop <= windowBottom - 100) {
+                    animateCounters();
+                    statsAnimated = true;
+                }
+            }
+        }, 100));
+    }
+}
+
+// Q&A 交互功能
+function initQAInteractions() {
+    // 过滤标签点击
+    $('.qa-filter-tabs .tab-btn').on('click', function() {
+        const $btn = $(this);
+        const category = $btn.data('category');
+        
+        // 更新激活状态和可访问性属性
+        $('.tab-btn').removeClass('active').attr('aria-pressed', 'false');
+        $btn.addClass('active').attr('aria-pressed', 'true');
+        
+        // 过滤问答卡片
+        filterQACards(category);
+    });
+    
+    // 问答卡片点击
+    $('.qa-card').on('click', function(e) {
+        if (!$(e.target).closest('.qa-expand-btn').length) {
+            const link = $(this).find('.question-title a').attr('href');
+            if (link) {
+                window.location.href = link;
+            }
+        }
+    });
+    
+    // 展开按钮点击
+    $('.qa-expand-btn').on('click', function(e) {
+        e.stopPropagation();
+        const $card = $(this).closest('.qa-card');
+        const link = $card.find('.question-title a').attr('href');
+        if (link) {
+            window.open(link, '_blank');
+        }
+    });
+    
+    // 加载更多按钮
+    $('.load-more-btn').on('click', function() {
+        loadMoreQA();
+    });
+    
+    // 问答卡片悬停效果已在initQACardEvents中处理
+}
+
+// 过滤问答卡片 - 优化DOM查询
+function filterQACards(category) {
+    const $cards = $('.qa-card');
+    
+    $cards.each(function() {
+        const $card = $(this);
+        const cardCategory = $card.data('category');
+        const views = parseInt($card.data('views')) || 0;
+        
+        let shouldShow = false;
+        
+        switch(category) {
+            case 'all':
+                shouldShow = true;
+                break;
+            case 'answered':
+                shouldShow = cardCategory === 'answered';
+                break;
+            case 'pending':
+                shouldShow = cardCategory === 'pending';
+                break;
+            case 'hot':
+                shouldShow = views > 500; // 热门问题阈值
+                break;
+        }
+        
+        if (shouldShow) {
+            $card.show().addClass('animate-on-scroll');
+        } else {
+            $card.hide().removeClass('animate-on-scroll');
+        }
+    });
+    
+    // 重新触发滚动动画
+    setTimeout(() => {
+        checkScrollAnimations();
+    }, 100);
+}
+
+// 加载更多问答
+function loadMoreQA() {
+    const $btn = $('.load-more-btn');
+    const $loading = $('.loading-indicator');
+    
+    $btn.hide();
+    $loading.show();
+    
+    // 模拟加载延迟
+    setTimeout(() => {
+        ajaxRequest({
+            url: '/api/qa/load-more.php',
+            type: 'GET',
+            data: {
+                offset: $('.qa-card').length,
+                limit: 6
+            },
+            success: function(response) {
+                if (response.success && response.data && response.data.length > 0) {
+                    appendQACards(response.data);
+                    $btn.show();
+                } else {
+                    $btn.text('没有更多问答了').prop('disabled', true);
+                    setTimeout(() => {
+                        $btn.hide();
+                    }, 2000);
+                }
+            },
+            error: function() {
+                $btn.text('加载失败，点击重试').show();
+            },
+            complete: function() {
+                $loading.hide();
+            }
+        });
+    }, 800);
+}
+
+// 添加问答卡片
+function appendQACards(qaData) {
+    const $grid = $('.qa-grid');
+    
+    qaData.forEach((qa, index) => {
+        const $card = createQACard(qa, index);
+        $grid.append($card);
+    });
+    
+    // 重新绑定事件
+    initQACardEvents();
+    
+    // 触发滚动动画
+    setTimeout(() => {
+        checkScrollAnimations();
+    }, 100);
+}
+
+// 创建问答卡片
+function createQACard(qa, index) {
+    const priorityBadge = getPriorityBadge(qa);
+    const tags = qa.tags ? qa.tags.split(',').map(tag => 
+        `<span class="tag">#${tag.trim()}</span>`
+    ).join('') : '';
+    
+    const viewCount = qa.view_count > 1000 ? 
+        (qa.view_count / 1000).toFixed(1) + 'k' : qa.view_count;
+    
+    return $(`
+        <div class="qa-card animate-on-scroll" 
+             style="animation-delay: ${index * 0.1}s"
+             data-category="${qa.answer_count > 0 ? 'answered' : 'pending'}"
+             data-views="${qa.view_count}">
+            
+            <div class="qa-card-header">
+                <div class="question-priority">
+                    ${priorityBadge}
+                </div>
+                
+                <div class="question-category">
+                    <i class="fas fa-tag"></i>
+                    ${qa.category_name || '综合咨询'}
+                </div>
+            </div>
+            
+            <div class="qa-card-content">
+                <h3 class="question-title">
+                    <a href="/qa/detail.php?id=${qa.id}">
+                        ${qa.title}
+                    </a>
+                </h3>
+                
+                <p class="question-preview">
+                    ${qa.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                </p>
+                
+                <div class="question-tags">
+                    ${tags}
+                </div>
+            </div>
+            
+            <div class="qa-card-footer">
+                <div class="question-author">
+                    <div class="author-avatar">
+                        <i class="fas fa-${qa.is_anonymous ? 'user-secret' : 'user-circle'}"></i>
+                    </div>
+                    <div class="author-info">
+                        <span class="author-name">
+                            ${qa.is_anonymous ? '匿名用户' : qa.username}
+                        </span>
+                        <span class="question-time">
+                            ${formatTime(qa.created_at)}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="question-stats">
+                    <div class="stat-group">
+                        <span class="stat-item">
+                            <i class="fas fa-comments"></i>
+                            ${qa.answer_count}
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-eye"></i>
+                            ${viewCount}
+                        </span>
+                        ${qa.answer_count > 0 ? '<span class="stat-item helpful"><i class="fas fa-thumbs-up"></i>有帮助</span>' : ''}
+                    </div>
+                    
+                    <button class="qa-expand-btn" title="查看详情">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `);
+}
+
+// 获取优先级徽章
+function getPriorityBadge(qa) {
+    if (qa.view_count > 1000) {
+        return '<span class="priority-badge hot"><i class="fas fa-fire"></i>热门</span>';
+    } else if (qa.answer_count > 0) {
+        return '<span class="priority-badge answered"><i class="fas fa-check-circle"></i>已解答</span>';
+    } else {
+        return '<span class="priority-badge pending"><i class="fas fa-clock"></i>待解答</span>';
+    }
+}
+
+// 初始化问答卡片事件
+function initQACardEvents() {
+    // 移除旧的事件监听器 - 完整解绑
+    $('.qa-card').off('.qacard');
+    $('.qa-expand-btn').off('.qaexpand');
+    $('.qa-card').off('mouseenter.qahover mouseleave.qahover');
+    
+    // 问答卡片点击
+    $('.qa-card').on('click.qacard', function(e) {
+        if (!$(e.target).closest('.qa-expand-btn').length) {
+            const link = $(this).find('.question-title a').attr('href');
+            if (link) {
+                window.location.href = link;
+            }
+        }
+    });
+    
+    // 展开按钮点击
+    $('.qa-expand-btn').on('click.qaexpand', function(e) {
+        e.stopPropagation();
+        const $card = $(this).closest('.qa-card');
+        const link = $card.find('.question-title a').attr('href');
+        if (link) {
+            window.open(link, '_blank');
+        }
+    });
+    
+    // 问答卡片悬停效果 - 使用命名空间
+    $('.qa-card').on('mouseenter.qahover', function() {
+        $(this).find('.qa-expand-btn').addClass('visible');
+    }).on('mouseleave.qahover', function() {
+        $(this).find('.qa-expand-btn').removeClass('visible');
+    });
+}
+
+// 检查滚动动画 - 缺失的函数定义
+function checkScrollAnimations() {
+    const windowTop = $(window).scrollTop();
+    const windowBottom = windowTop + $(window).height();
+    
+    $('.animate-on-scroll:visible').each(function() {
+        const $element = $(this);
+        if (!$element.hasClass('animated')) {
+            const elementTop = $element.offset().top;
+            const elementBottom = elementTop + $element.outerHeight();
+            
+            if (elementBottom >= windowTop && elementTop <= windowBottom - 50) {
+                $element.addClass('animated');
+            }
+        }
+    });
+}
 
 // 错误处理
 window.onerror = function(message, source, lineno, colno, error) {

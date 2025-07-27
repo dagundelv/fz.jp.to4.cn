@@ -233,32 +233,58 @@ function getClientIP() {
 function recordSearchKeyword($keyword, $category = null, $resultCount = 0) {
     $db = Database::getInstance();
     
-    // 检查关键词是否已存在
-    $existing = $db->fetch(
-        "SELECT id, search_count FROM search_keywords WHERE keyword = ?",
-        [$keyword]
-    );
+    // 验证category值，确保符合ENUM定义
+    $validCategories = ['doctor', 'hospital', 'disease', 'article', 'question'];
+    if ($category && !in_array($category, $validCategories)) {
+        $category = null;
+    }
     
-    if ($existing) {
-        // 更新搜索次数
-        $db->update(
-            'search_keywords',
-            [
-                'search_count' => $existing['search_count'] + 1,
-                'result_count' => $resultCount,
-                'category' => $category
-            ],
-            'id = ?',
-            [$existing['id']]
+    // 如果是空字符串，设为null
+    if ($category === '') {
+        $category = null;
+    }
+    
+    try {
+        // 检查关键词是否已存在
+        $existing = $db->fetch(
+            "SELECT id, search_count FROM search_keywords WHERE keyword = ?",
+            [$keyword]
         );
-    } else {
-        // 插入新关键词
-        $db->insert('search_keywords', [
-            'keyword' => $keyword,
-            'search_count' => 1,
-            'result_count' => $resultCount,
-            'category' => $category
-        ]);
+        
+        if ($existing) {
+            // 更新搜索次数
+            $updateData = [
+                'search_count' => $existing['search_count'] + 1,
+                'result_count' => $resultCount
+            ];
+            
+            if ($category !== null) {
+                $updateData['category'] = $category;
+            }
+            
+            $db->update(
+                'search_keywords',
+                $updateData,
+                'id = ?',
+                [$existing['id']]
+            );
+        } else {
+            // 插入新关键词
+            $insertData = [
+                'keyword' => $keyword,
+                'search_count' => 1,
+                'result_count' => $resultCount
+            ];
+            
+            if ($category !== null) {
+                $insertData['category'] = $category;
+            }
+            
+            $db->insert('search_keywords', $insertData);
+        }
+    } catch (Exception $e) {
+        // 静默失败，不影响搜索功能
+        error_log("记录搜索关键词失败: " . $e->getMessage());
     }
 }
 
@@ -349,65 +375,117 @@ function getFeaturedDoctors($limit = 8) {
 
 // 获取热门问题
 function getHotQuestions($limit = 6) {
-    $db = Database::getInstance();
-    return $db->fetchAll("
-        SELECT q.*, u.username, c.name as category_name,
-               (SELECT COUNT(*) FROM qa_answers WHERE question_id = q.id AND status = 'published') as answer_count
-        FROM qa_questions q 
-        LEFT JOIN users u ON q.user_id = u.id 
-        LEFT JOIN categories c ON q.category_id = c.id 
-        WHERE q.status = 'published' 
-        ORDER BY q.view_count DESC, q.created_at DESC 
-        LIMIT ?
-    ", [$limit]);
+    return cache_remember('hot_questions_' . $limit, function() use ($limit) {
+        $db = Database::getInstance();
+        return $db->fetchAll("
+            SELECT q.*, u.username, c.name as category_name,
+                   (SELECT COUNT(*) FROM qa_answers WHERE question_id = q.id AND status = 'published') as answer_count
+            FROM qa_questions q 
+            LEFT JOIN users u ON q.user_id = u.id 
+            LEFT JOIN categories c ON q.category_id = c.id 
+            WHERE q.status = 'published' 
+            ORDER BY q.view_count DESC, q.created_at DESC 
+            LIMIT ?
+        ", [$limit]);
+    }, 1800); // 缓存30分钟
 }
 
 // 获取分类树
 function getCategoryTree() {
-    $db = Database::getInstance();
-    return $db->fetchAll("
-        SELECT * FROM categories 
-        WHERE status = 'active' 
-        ORDER BY parent_id, sort_order, name
-    ");
+    return cache_remember('category_tree', function() {
+        $db = Database::getInstance();
+        return $db->fetchAll("
+            SELECT * FROM categories 
+            WHERE status = 'active' 
+            ORDER BY parent_id, sort_order, name
+        ");
+    }, 3600); // 缓存1小时
 }
 
 // 获取热门搜索
 function getPopularSearches($limit = 8) {
-    $db = Database::getInstance();
-    return $db->fetchAll("
-        SELECT keyword, search_count 
-        FROM search_keywords 
-        WHERE search_count > 1 
-        ORDER BY search_count DESC 
-        LIMIT ?
-    ", [$limit]);
+    return cache_remember('popular_searches_' . $limit, function() use ($limit) {
+        $db = Database::getInstance();
+        return $db->fetchAll("
+            SELECT keyword, search_count 
+            FROM search_keywords 
+            WHERE search_count > 1 
+            ORDER BY search_count DESC 
+            LIMIT ?
+        ", [$limit]);
+    }, 1800); // 缓存30分钟
 }
 
 // 获取网站统计
 function getSiteStats() {
-    $db = Database::getInstance();
-    return [
-        'doctors' => $db->fetch("SELECT COUNT(*) as count FROM doctors WHERE status = 'active'")['count'],
-        'hospitals' => $db->fetch("SELECT COUNT(*) as count FROM hospitals WHERE status = 'active'")['count'],
-        'articles' => $db->fetch("SELECT COUNT(*) as count FROM articles WHERE status = 'published'")['count'],
-        'questions' => $db->fetch("SELECT COUNT(*) as count FROM qa_questions WHERE status = 'published'")['count'],
-        'users' => $db->fetch("SELECT COUNT(*) as count FROM users WHERE status = 'active'")['count']
-    ];
+    return cache_remember('site_stats', function() {
+        $db = Database::getInstance();
+        return [
+            'doctors' => $db->fetch("SELECT COUNT(*) as count FROM doctors WHERE status = 'active'")['count'],
+            'hospitals' => $db->fetch("SELECT COUNT(*) as count FROM hospitals WHERE status = 'active'")['count'],
+            'articles' => $db->fetch("SELECT COUNT(*) as count FROM articles WHERE status = 'published'")['count'],
+            'questions' => $db->fetch("SELECT COUNT(*) as count FROM qa_questions WHERE status = 'published'")['count'],
+            'users' => $db->fetch("SELECT COUNT(*) as count FROM users WHERE status = 'active'")['count']
+        ];
+    }, 3600); // 缓存1小时
 }
 
 // 获取分类列表
 function getCategories($parentId = 0) {
-    $db = Database::getInstance();
-    return $db->fetchAll(
-        "SELECT * FROM categories WHERE parent_id = ? AND status = 'active' ORDER BY sort_order ASC, id ASC",
-        [$parentId]
-    );
+    return cache_remember('categories_' . $parentId, function() use ($parentId) {
+        $db = Database::getInstance();
+        return $db->fetchAll(
+            "SELECT * FROM categories WHERE parent_id = ? AND status = 'active' ORDER BY sort_order ASC, id ASC",
+            [$parentId]
+        );
+    }, 3600); // 缓存1小时
 }
 
 // 根据ID获取分类
 function getCategoryById($id) {
     $db = Database::getInstance();
     return $db->fetch("SELECT * FROM categories WHERE id = ? AND status = 'active'", [$id]);
+}
+
+// 检查是否为开发环境
+function isDev() {
+    return defined('ENVIRONMENT') && ENVIRONMENT === 'development';
+}
+
+// 清除特定缓存（当数据更新时调用）
+function clearDataCache($pattern = '') {
+    if ($pattern) {
+        // 清除匹配的缓存
+        $cache = CacheManager::getInstance();
+        // 这里可以扩展为支持模式匹配的清除
+        return true;
+    }
+    return false;
+}
+
+// 数据更新时清除相关缓存的助手函数
+function invalidateCache($type, $id = null) {
+    switch ($type) {
+        case 'doctor':
+            if ($id) {
+                cache_delete('related_doctors_' . $id);
+                cache_delete('hospital_doctors_' . $id);
+            }
+            break;
+        case 'category':
+            cache_delete('category_tree');
+            cache_delete('categories_0');
+            if ($id) {
+                cache_delete('categories_' . $id);
+            }
+            break;
+        case 'question':
+            cache_delete('hot_questions_6');
+            cache_delete('site_stats');
+            break;
+        case 'stats':
+            cache_delete('site_stats');
+            break;
+    }
 }
 ?>

@@ -726,6 +726,7 @@
     border-radius: 8px;
     font-size: 14px;
     transition: border-color 0.2s;
+    box-sizing: border-box;
 }
 
 .form-control:focus {

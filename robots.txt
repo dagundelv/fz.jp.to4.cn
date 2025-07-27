@@ -1,0 +1,38 @@
+User-agent: *
+Allow: /
+
+# 禁止访问管理后台
+Disallow: /admin/
+Disallow: /api/
+Disallow: /includes/
+Disallow: /config/
+Disallow: /vendor/
+Disallow: /cache/
+Disallow: /uploads/temp/
+
+# 禁止访问敏感文件
+Disallow: /*.log$
+Disallow: /*.sql$
+Disallow: /*.ini$
+Disallow: /*.conf$
+
+# 允许访问重要资源
+Allow: /assets/
+Allow: /uploads/
+Allow: /sitemap.xml
+
+# 站点地图位置
+Sitemap: https://fz.jp.to4.cn/sitemap.xml
+
+# 爬取延迟（秒）
+Crawl-delay: 1
+
+# 特定搜索引擎设置
+User-agent: Googlebot
+Crawl-delay: 0
+
+User-agent: Baiduspider
+Crawl-delay: 1
+
+User-agent: 360Spider
+Crawl-delay: 2

@@ -30,32 +30,51 @@ if (!$doctor) {
 $db->query("UPDATE doctors SET view_count = view_count + 1 WHERE id = ?", [$doctorId]);
 
 // 设置页面信息
-$pageTitle = $doctor['name'] . " - " . $doctor['title'] . " - " . SITE_NAME;
+$pageTitle = $doctor['name'] . " - " . $doctor['title'];
 $pageDescription = $doctor['name'] . "，" . $doctor['title'] . "，" . $doctor['hospital_name'] . "，擅长：" . strip_tags($doctor['specialties']);
 $pageKeywords = $doctor['name'] . "," . $doctor['title'] . "," . $doctor['category_name'] . "," . $doctor['hospital_name'];
+$pageImage = $doctor['avatar'] ? SITE_URL . $doctor['avatar'] : null;
 $currentPage = 'doctors';
 
+// 生成医生结构化数据
+seo()->generateDoctorSchema($doctor);
+
+// 生成面包屑导航结构化数据
+$breadcrumbs = [
+    ['title' => '医生查询', 'url' => '/doctors/'],
+    ['title' => $doctor['category_name'], 'url' => '/doctors/?category=' . $doctor['category_id']],
+    ['title' => $doctor['name']]
+];
+seo()->generateBreadcrumbSchema($breadcrumbs);
+
+// 跳过组织架构化数据（已在其他地方生成）
+$skipOrganizationSchema = true;
+
 // 获取同科室医生推荐
-$relatedDoctors = $db->fetchAll("
-    SELECT d.*, h.name as hospital_name, h.city as hospital_city,
-           c.name as category_name
-    FROM doctors d 
-    LEFT JOIN hospitals h ON d.hospital_id = h.id
-    LEFT JOIN categories c ON d.category_id = c.id
-    WHERE d.category_id = ? AND d.id != ? AND d.status = 'active' AND h.status = 'active'
-    ORDER BY d.rating DESC, d.view_count DESC
-    LIMIT 6
-", [$doctor['category_id'], $doctorId]);
+$relatedDoctors = cache_remember('related_doctors_' . $doctor['category_id'] . '_' . $doctorId, function() use ($db, $doctor, $doctorId) {
+    return $db->fetchAll("
+        SELECT d.*, h.name as hospital_name, h.city as hospital_city,
+               c.name as category_name
+        FROM doctors d 
+        LEFT JOIN hospitals h ON d.hospital_id = h.id
+        LEFT JOIN categories c ON d.category_id = c.id
+        WHERE d.category_id = ? AND d.id != ? AND d.status = 'active' AND h.status = 'active'
+        ORDER BY d.rating DESC, d.view_count DESC
+        LIMIT 6
+    ", [$doctor['category_id'], $doctorId]);
+}, 1800); // 缓存30分钟
 
 // 获取同医院医生推荐
-$hospitalDoctors = $db->fetchAll("
-    SELECT d.*, c.name as category_name
-    FROM doctors d 
-    LEFT JOIN categories c ON d.category_id = c.id
-    WHERE d.hospital_id = ? AND d.id != ? AND d.status = 'active'
-    ORDER BY d.title DESC, d.rating DESC
-    LIMIT 8
-", [$doctor['hospital_id'], $doctorId]);
+$hospitalDoctors = cache_remember('hospital_doctors_' . $doctor['hospital_id'] . '_' . $doctorId, function() use ($db, $doctor, $doctorId) {
+    return $db->fetchAll("
+        SELECT d.*, c.name as category_name
+        FROM doctors d 
+        LEFT JOIN categories c ON d.category_id = c.id
+        WHERE d.hospital_id = ? AND d.id != ? AND d.status = 'active'
+        ORDER BY d.title DESC, d.rating DESC
+        LIMIT 8
+    ", [$doctor['hospital_id'], $doctorId]);
+}, 1800); // 缓存30分钟
 
 // 获取患者评价（示例数据）
 $reviews = [
@@ -84,14 +103,7 @@ include '../templates/header.php';
     <!-- 面包屑导航 -->
     <div class="breadcrumb-section">
         <div class="container">
-            <?php
-            $breadcrumbs = [
-                ['title' => '医生查询', 'url' => '/doctors/'],
-                ['title' => $doctor['category_name'], 'url' => '/doctors/?category=' . $doctor['category_id']],
-                ['title' => $doctor['name']]
-            ];
-            echo generateBreadcrumb($breadcrumbs);
-            ?>
+            <?php echo generateBreadcrumb($breadcrumbs); ?>
         </div>
     </div>
     

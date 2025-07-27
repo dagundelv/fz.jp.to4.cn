@@ -398,7 +398,10 @@ $(document).ready(function() {
         $('input[name="appointment_time"]').prop('checked', false);
         $('.time-card').removeClass('disabled');
         
-        // 这里可以添加AJAX请求检查该日期的可用时间段
+        // 显示加载状态
+        $('.time-options').addClass('loading');
+        
+        // AJAX请求检查该日期的可用时间段
         checkAvailableTimeSlots(selectedDate);
     });
     
@@ -415,9 +418,53 @@ $(document).ready(function() {
     
     // 检查可用时间段
     function checkAvailableTimeSlots(date) {
-        // 模拟AJAX请求
-        // 这里应该向服务器请求该日期的已预约时间段
-        console.log('Checking available time slots for:', date);
+        if (!date) return;
+        
+        const doctorId = <?php echo $doctorId; ?>;
+        
+        $.ajax({
+            url: '/api/appointment-slots.php',
+            method: 'GET',
+            data: {
+                doctor_id: doctorId,
+                date: date
+            },
+            success: function(response) {
+                $('.time-options').removeClass('loading');
+                
+                if (response.success && response.data) {
+                    updateTimeSlots(response.data);
+                } else {
+                    showMessage(response.message || '获取时间段失败', 'error');
+                    $('.time-card').addClass('disabled');
+                }
+            },
+            error: function() {
+                $('.time-options').removeClass('loading');
+                showMessage('网络错误，请稍后重试', 'error');
+                $('.time-card').addClass('disabled');
+            }
+        });
+    }
+    
+    // 更新时间段显示
+    function updateTimeSlots(sessions) {
+        $('.time-card').addClass('disabled').removeClass('available');
+        
+        sessions.forEach(function(session) {
+            session.slots.forEach(function(slot) {
+                const timeInput = $('input[name="appointment_time"][value="' + slot.time + '"]');
+                const timeCard = timeInput.parent().find('.time-card');
+                
+                if (slot.available) {
+                    timeCard.removeClass('disabled').addClass('available');
+                    timeInput.prop('disabled', false);
+                } else {
+                    timeCard.addClass('disabled').removeClass('available');
+                    timeInput.prop('disabled', true);
+                }
+            });
+        });
     }
     
     // 检查特定时间段可用性
