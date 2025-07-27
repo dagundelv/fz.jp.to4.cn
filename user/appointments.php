@@ -17,8 +17,48 @@ $status = $_GET['status'] ?? '';
 $page = intval($_GET['page'] ?? 1);
 $limit = 10;
 
+// 服务器端预加载预约数据作为fallback
+$userId = $currentUser['id'];
+$whereClause = "a.user_id = ?";
+$params = [$userId];
+
+if ($status && in_array($status, ['pending', 'confirmed', 'cancelled', 'completed'])) {
+    $whereClause .= " AND a.status = ?";
+    $params[] = $status;
+}
+
+try {
+    $serverAppointments = $db->fetchAll("
+        SELECT a.*, 
+               d.name as doctor_name, 
+               d.title as doctor_title, 
+               d.avatar as doctor_avatar,
+               h.name as hospital_name, 
+               h.address as hospital_address, 
+               h.phone as hospital_phone,
+               c.name as category_name
+        FROM appointments a
+        LEFT JOIN doctors d ON a.doctor_id = d.id
+        LEFT JOIN hospitals h ON d.hospital_id = h.id
+        LEFT JOIN categories c ON d.category_id = c.id
+        WHERE $whereClause
+        ORDER BY a.created_at DESC
+        LIMIT $limit OFFSET " . (($page - 1) * $limit) . "
+    ", $params);
+    
+    $totalAppointments = $db->fetch("
+        SELECT COUNT(*) as count 
+        FROM appointments a
+        WHERE $whereClause
+    ", $params)['count'];
+    
+} catch (Exception $e) {
+    $serverAppointments = [];
+    $totalAppointments = 0;
+}
+
 // 添加页面特定的CSS
-$pageCSS = ['/assets/css/appointment.css', '/assets/css/user.css'];
+$pageCSS = ['/assets/css/appointment.css', '/assets/css/user.css', '/assets/css/appointments-page.css'];
 
 include '../templates/header.php';
 ?>
@@ -85,17 +125,150 @@ include '../templates/header.php';
                 
                 <!-- 预约列表 -->
                 <div class="appointments-list" id="appointmentsList">
-                    <div class="loading-placeholder">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            正在加载预约记录...
+                    <?php if (count($serverAppointments) > 0): ?>
+                        <!-- 服务器端渲染的预约记录 -->
+                        <?php foreach ($serverAppointments as $appointment): ?>
+                            <div class="appointment-card" data-id="<?php echo $appointment['id']; ?>">
+                                <div class="appointment-header">
+                                    <div class="appointment-number">
+                                        预约号：<?php echo h($appointment['appointment_number'] ?: $appointment['id']); ?>
+                                    </div>
+                                    <div class="appointment-status status-<?php echo $appointment['status']; ?>">
+                                        <i class="fas fa-<?php 
+                                            switch($appointment['status']) {
+                                                case 'pending': echo 'clock'; break;
+                                                case 'confirmed': echo 'check-circle'; break;
+                                                case 'completed': echo 'check-double'; break;
+                                                case 'cancelled': echo 'times-circle'; break;
+                                                default: echo 'question-circle';
+                                            }
+                                        ?>"></i>
+                                        <?php
+                                            switch($appointment['status']) {
+                                                case 'pending': echo '待确认'; break;
+                                                case 'confirmed': echo '已确认'; break;
+                                                case 'completed': echo '已完成'; break;
+                                                case 'cancelled': echo '已取消'; break;
+                                                default: echo $appointment['status'];
+                                            }
+                                        ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="appointment-main">
+                                    <div class="doctor-info">
+                                        <div class="doctor-avatar">
+                                            <?php if ($appointment['doctor_avatar']): ?>
+                                                <img src="<?php echo h($appointment['doctor_avatar']); ?>" alt="<?php echo h($appointment['doctor_name']); ?>">
+                                            <?php else: ?>
+                                                <div class="avatar-placeholder">
+                                                    <i class="fas fa-user-md"></i>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="doctor-details">
+                                            <h4><?php echo h($appointment['doctor_name'] ?: '未知医生'); ?></h4>
+                                            <div class="doctor-title"><?php echo h($appointment['doctor_title'] ?: ''); ?></div>
+                                            <div class="doctor-category"><?php echo h($appointment['category_name'] ?: ''); ?></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="appointment-info">
+                                        <div class="info-row">
+                                            <div class="info-item">
+                                                <i class="fas fa-calendar"></i>
+                                                <span><?php echo date('Y年m月d日', strtotime($appointment['appointment_date'])); ?></span>
+                                            </div>
+                                            <div class="info-item">
+                                                <i class="fas fa-clock"></i>
+                                                <span><?php echo date('H:i', strtotime($appointment['appointment_time'])); ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="info-item">
+                                                <i class="fas fa-hospital"></i>
+                                                <span><?php echo h($appointment['hospital_name'] ?: '未知医院'); ?></span>
+                                            </div>
+                                            <div class="info-item">
+                                                <i class="fas fa-user"></i>
+                                                <span><?php echo h($appointment['patient_name'] ?: ''); ?></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="appointment-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="viewAppointment(<?php echo $appointment['id']; ?>)">
+                                        <i class="fas fa-eye"></i>
+                                        查看详情
+                                    </button>
+                                    <?php 
+                                    $appointmentDateTime = strtotime($appointment['appointment_date'] . ' ' . $appointment['appointment_time']);
+                                    $canCancel = $appointment['status'] === 'pending' && $appointmentDateTime > time() + 24 * 60 * 60;
+                                    ?>
+                                    <?php if ($canCancel): ?>
+                                        <button class="btn btn-danger btn-sm" onclick="cancelAppointment(<?php echo $appointment['id']; ?>)">
+                                            <i class="fas fa-times"></i>
+                                            取消预约
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if ($appointment['status'] === 'completed'): ?>
+                                        <button class="btn btn-primary btn-sm" onclick="writeReview(<?php echo $appointment['id']; ?>)">
+                                            <i class="fas fa-star"></i>
+                                            写评价
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <!-- 无预约记录时的显示 -->
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <h3>暂无预约记录</h3>
+                            <p>您还没有任何预约记录</p>
+                            <a href="/doctors/" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                立即预约
+                            </a>
                         </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- 分页 -->
-                <div class="pagination-wrapper" id="paginationWrapper" style="display: none;">
-                    <!-- 分页内容将由JavaScript动态生成 -->
+                <div class="pagination-wrapper" id="paginationWrapper">
+                    <?php if ($totalAppointments > $limit): ?>
+                        <div class="pagination">
+                            <?php
+                            $totalPages = ceil($totalAppointments / $limit);
+                            $paginationParams = $_GET;
+                            
+                            // 上一页
+                            if ($page > 1) {
+                                $paginationParams['page'] = $page - 1;
+                                echo '<a href="/user/appointments.php?' . http_build_query($paginationParams) . '" class="page-btn">上一页</a>';
+                            }
+                            
+                            // 页码
+                            for ($i = 1; $i <= $totalPages; $i++) {
+                                if ($i === $page) {
+                                    echo '<span class="page-btn active">' . $i . '</span>';
+                                } else {
+                                    $paginationParams['page'] = $i;
+                                    echo '<a href="/user/appointments.php?' . http_build_query($paginationParams) . '" class="page-btn">' . $i . '</a>';
+                                }
+                            }
+                            
+                            // 下一页
+                            if ($page < $totalPages) {
+                                $paginationParams['page'] = $page + 1;
+                                echo '<a href="/user/appointments.php?' . http_build_query($paginationParams) . '" class="page-btn">下一页</a>';
+                            }
+                            ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </main>
         </div>
@@ -156,7 +329,17 @@ let currentPage = <?php echo $page; ?>;
 let currentStatus = '<?php echo addslashes($status); ?>';
 
 $(document).ready(function() {
-    loadAppointments();
+    console.log('Appointments page loaded...');
+    
+    // 检查是否已有服务器端数据
+    const hasServerData = $('.appointment-card').length > 0 || $('.empty-state').length > 0;
+    
+    if (hasServerData) {
+        console.log('Server-side data found, skipping AJAX load');
+    } else {
+        console.log('No server data, loading via AJAX...');
+        loadAppointments();
+    }
     
     // 取消原因选择
     $('#cancelReason').on('change', function() {
@@ -170,6 +353,7 @@ $(document).ready(function() {
 
 // 加载预约列表
 function loadAppointments(page = 1) {
+    console.log('Loading appointments, page:', page, 'status:', currentStatus);
     $.ajax({
         url: '/api/appointments.php',
         method: 'GET',
@@ -186,8 +370,25 @@ function loadAppointments(page = 1) {
                 showError('加载预约记录失败: ' + response.message);
             }
         },
-        error: function() {
-            showError('网络错误，请稍后重试');
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', status, error);
+            if (xhr.status === 401) {
+                window.location.href = '/user/login.php';
+            } else {
+                $('#appointmentsList').html(`
+                    <div class="error-state">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>加载失败</h3>
+                        <p>无法加载预约记录，请稍后重试</p>
+                        <button class="btn btn-primary" onclick="loadAppointments()">
+                            <i class="fas fa-refresh"></i>
+                            重新加载
+                        </button>
+                    </div>
+                `);
+            }
         }
     });
 }

@@ -31,27 +31,24 @@ try {
             $params[] = $status;
         }
         
-        // 获取预约列表 (用户特定数据不适合长期缓存，使用短时间缓存)
-        $cacheKey = 'user_appointments_' . $userId . '_' . md5(serialize($params) . $limit . $offset);
-        $appointments = cache_remember($cacheKey, function() use ($db, $whereClause, $params, $limit, $offset) {
-            return $db->fetchAll("
-                SELECT a.*, 
-                       d.name as doctor_name, 
-                       d.title as doctor_title, 
-                       d.avatar as doctor_avatar,
-                       h.name as hospital_name, 
-                       h.address as hospital_address, 
-                       h.phone as hospital_phone,
-                       c.name as category_name
-                FROM appointments a
-                LEFT JOIN doctors d ON a.doctor_id = d.id
-                LEFT JOIN hospitals h ON d.hospital_id = h.id
-                LEFT JOIN categories c ON d.category_id = c.id
-                WHERE $whereClause
-                ORDER BY a.created_at DESC
-                LIMIT $limit OFFSET $offset
-            ", $params);
-        }, 300); // 短期缓存5分钟
+        // 获取预约列表
+        $appointments = $db->fetchAll("
+            SELECT a.*, 
+                   d.name as doctor_name, 
+                   d.title as doctor_title, 
+                   d.avatar as doctor_avatar,
+                   h.name as hospital_name, 
+                   h.address as hospital_address, 
+                   h.phone as hospital_phone,
+                   c.name as category_name
+            FROM appointments a
+            LEFT JOIN doctors d ON a.doctor_id = d.id
+            LEFT JOIN hospitals h ON d.hospital_id = h.id
+            LEFT JOIN categories c ON d.category_id = c.id
+            WHERE $whereClause
+            ORDER BY a.created_at DESC
+            LIMIT $limit OFFSET $offset
+        ", $params);
         
         // 获取总数
         $total = $db->fetch("

@@ -510,6 +510,8 @@
     gap: 10px;
     width: 120px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
 }
 
 .doctor-actions .btn {
@@ -526,6 +528,8 @@
     gap: 5px;
     border: 1px solid transparent;
     cursor: pointer;
+    position: relative;
+    z-index: 3;
 }
 
 .btn-primary {

@@ -121,7 +121,8 @@ $featuredDoctors = $db->fetchAll("
 ");
 
 // 添加页面特定的CSS和JS
-$pageCSS = ['/assets/css/doctors.css'];
+$pageCSS = ['/assets/css/doctors.css', '/assets/css/doctor-buttons-fix.css'];
+$pageJS = ['/assets/js/favorites.js'];
 
 include '../templates/header.php';
 ?>
@@ -424,7 +425,7 @@ include '../templates/header.php';
                                         <i class="fas fa-user"></i>
                                         查看详情
                                     </a>
-                                    <a href="/user/appointment.php?doctor_id=<?php echo $doctor['id']; ?>" 
+                                    <a href="/appointment/book.php?doctor_id=<?php echo $doctor['id']; ?>" 
                                        class="btn btn-secondary">
                                         <i class="fas fa-calendar-check"></i>
                                         立即预约
@@ -544,6 +545,19 @@ include '../templates/header.php';
 
 <script>
 $(document).ready(function() {
+    // 调试：检查按钮点击事件
+    $('.doctor-actions a').on('click', function(e) {
+        console.log('Button clicked:', $(this).attr('href'));
+        // 不阻止默认行为，让链接正常工作
+    });
+    
+    // 确保按钮可点击
+    $('.doctor-actions .btn').css({
+        'pointer-events': 'auto',
+        'position': 'relative',
+        'z-index': '10'
+    });
+    
     // 在线咨询弹窗
     $('.consultation-btn').on('click', function() {
         const doctorId = $(this).data('doctor-id');
@@ -572,10 +586,50 @@ $(document).ready(function() {
     $('.consultation-form').on('submit', function(e) {
         e.preventDefault();
         
-        // 这里可以添加AJAX提交逻辑
-        showMessage('咨询已发送，医生会尽快回复', 'success');
-        $('#consultationModal').fadeOut(300);
-        $(this)[0].reset();
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+        const originalText = $submitBtn.text();
+        
+        // 禁用提交按钮
+        $submitBtn.prop('disabled', true).text('发送中...');
+        
+        // 获取表单数据
+        const formData = {
+            doctor_id: $('#consultationDoctorId').val(),
+            content: $form.find('textarea[name="content"]').val(),
+            is_anonymous: $form.find('input[name="is_anonymous"]').is(':checked') ? 1 : 0
+        };
+        
+        // 提交到API
+        $.ajax({
+            url: '/api/consultations.php',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                if (response.success) {
+                    showMessage(response.message, 'success');
+                    $('#consultationModal').fadeOut(300);
+                    $form[0].reset();
+                } else {
+                    showMessage(response.message, 'error');
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    showMessage('请先登录', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/user/login.php';
+                    }, 1500);
+                } else {
+                    showMessage('发送失败，请稍后重试', 'error');
+                }
+            },
+            complete: function() {
+                // 恢复提交按钮
+                $submitBtn.prop('disabled', false).text(originalText);
+            }
+        });
     });
 });
 </script>

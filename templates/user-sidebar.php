@@ -35,16 +35,22 @@ $currentScript = basename($_SERVER['PHP_SELF'], '.php');
                     <span>我的预约</span>
                     <?php
                     // 获取待确认预约数量
-                    $pendingCount = $db->fetch("
-                        SELECT COUNT(*) as count 
-                        FROM appointments 
-                        WHERE user_id = ? AND status = 'pending'
-                    ", [$currentUser['id']])['count'];
-                    
-                    if ($pendingCount > 0):
+                    try {
+                        $pendingCount = $db->fetch("
+                            SELECT COUNT(*) as count 
+                            FROM appointments 
+                            WHERE user_id = ? AND status = 'pending'
+                        ", [$currentUser['id']])['count'];
+                        
+                        if ($pendingCount > 0):
+                        ?>
+                            <span class="nav-badge"><?php echo $pendingCount; ?></span>
+                        <?php 
+                        endif;
+                    } catch (Exception $e) {
+                        // 忽略侧边栏计数错误
+                    }
                     ?>
-                        <span class="nav-badge"><?php echo $pendingCount; ?></span>
-                    <?php endif; ?>
                 </a>
             </li>
             

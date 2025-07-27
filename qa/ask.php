@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_question'])) {
     $title = trim($_POST['title'] ?? '');
     $content = trim($_POST['content'] ?? '');
     $categoryId = intval($_POST['category_id'] ?? 0);
-    $isAnonymous = isset($_POST['is_anonymous']) ? 1 : 0;
     $isUrgent = isset($_POST['is_urgent']) ? 1 : 0;
     
     // 验证输入
@@ -42,10 +41,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_question'])) {
         $submitError = '请选择问题分类';
     } else {
         try {
-            $questionId = $db->query("
-                INSERT INTO qa_questions (user_id, category_id, title, content, is_anonymous, is_urgent, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW())
-            ", [$currentUser['id'], $categoryId, $title, $content, $isAnonymous, $isUrgent]);
+            // 使用正确的表名和字段，qa_questions表支持is_urgent但不支持is_anonymous
+            $questionId = $db->insert('qa_questions', [
+                'user_id' => $currentUser['id'],
+                'category_id' => $categoryId,
+                'title' => $title,
+                'content' => $content,
+                'is_urgent' => $isUrgent,
+                'status' => 'published'
+            ]);
             
             $submitSuccess = true;
             // 重定向到问题详情页
@@ -53,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_question'])) {
             exit;
             
         } catch (Exception $e) {
-            $submitError = '提交失败，请稍后重试';
+            $submitError = '提交失败，请稍后重试: ' . (DEBUG_MODE ? $e->getMessage() : '');
         }
     }
 }
@@ -164,16 +168,6 @@ include '../templates/header.php';
                                 问题选项
                             </label>
                             <div class="form-options">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" name="is_anonymous" value="1" 
-                                           <?php echo isset($_POST['is_anonymous']) ? 'checked' : ''; ?>>
-                                    <span class="checkbox-text">
-                                        <i class="fas fa-user-secret"></i>
-                                        匿名提问
-                                    </span>
-                                    <small>选择匿名提问将不会显示您的用户名</small>
-                                </label>
-                                
                                 <label class="checkbox-label">
                                     <input type="checkbox" name="is_urgent" value="1"
                                            <?php echo isset($_POST['is_urgent']) ? 'checked' : ''; ?>>

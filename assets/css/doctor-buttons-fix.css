@@ -1,0 +1,49 @@
+/* 医生页面按钮点击修复 */
+
+/* 确保医生卡片的伪元素不会阻挡按钮 */
+.doctor-card::before {
+    pointer-events: none !important;
+}
+
+/* 确保按钮区域有足够高的z-index */
+.doctor-actions {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+}
+
+/* 确保所有按钮都可以点击 */
+.doctor-actions .btn,
+.doctor-actions a {
+    position: relative !important;
+    z-index: 101 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* 特别针对预约和详情按钮 */
+.doctor-actions .btn-primary,
+.doctor-actions .btn-secondary {
+    position: relative !important;
+    z-index: 102 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    display: block !important;
+    text-decoration: none !important;
+}
+
+/* 确保按钮悬停效果正常 */
+.doctor-actions .btn:hover {
+    transform: none !important;
+    z-index: 103 !important;
+}
+
+/* 移除可能阻挡的覆盖层 */
+.doctor-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.doctor-card .doctor-actions {
+    z-index: 100 !important;
+}
